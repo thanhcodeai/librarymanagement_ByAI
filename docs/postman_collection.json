@@ -1,0 +1,338 @@
+{
+  "info": {
+    "name": "Lá Thư Viện · SRS baseline",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "username",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "newUsername",
+      "value": ""
+    },
+    {
+      "key": "newPassword",
+      "value": ""
+    },
+    {
+      "key": "bookCode",
+      "value": "BK-NEW"
+    },
+    {
+      "key": "bookId",
+      "value": "1"
+    },
+    {
+      "key": "requestId",
+      "value": "1"
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "FR-01 · Đăng ký",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "description": "Authorization: public. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{newUsername}}\",\n  \"fullName\": \"Nguyễn An\",\n  \"email\": \"\",\n  \"password\": \"{{newPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-02 · Đăng nhập",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Authorization: public. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-08 · Đăng xuất và thu hồi session",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/auth/logout",
+        "description": "Authorization: public. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-06 · Hồ sơ của chính mình",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/me",
+        "description": "Authorization: member. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-03 · Tìm kiếm sách",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books",
+        "description": "Authorization: member. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-04 · Chi tiết sách",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books/{{bookId}}",
+        "description": "Authorization: member. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-05 · Gửi yêu cầu mượn",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/borrow-requests",
+        "description": "Authorization: user. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bookId\": {{bookId}},\n  \"borrowDate\": \"2026-10-16\",\n  \"dueDate\": \"2026-10-30\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-07 · Lịch sử của chính mình",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/me/borrow-requests",
+        "description": "Authorization: member. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-09 · Thống kê",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/admin/stats",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-10 · Danh sách sách",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/admin/books",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-10 · Tạo sách",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/books",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bookCode\": \"{{bookCode}}\",\n  \"title\": \"Sách mới\",\n  \"author\": \"Tác giả\",\n  \"category\": \"Văn học\",\n  \"description\": \"Giới thiệu sách\",\n  \"totalQuantity\": 5\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-10 · Cập nhật sách",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/books/{{bookId}}",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bookCode\": \"{{bookCode}}\",\n  \"title\": \"Sách mới\",\n  \"author\": \"Tác giả\",\n  \"category\": \"Văn học\",\n  \"description\": \"Giới thiệu sách\",\n  \"totalQuantity\": 5\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-10 · Xóa sách không có lịch sử",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/admin/books/{{bookId}}",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-11 · Danh sách yêu cầu",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/admin/borrow-requests",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-11 · Duyệt/từ chối yêu cầu",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/borrow-requests/{{requestId}}",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"decision\": \"APPROVE\",\n  \"note\": \"Mời bạn nhận sách\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-12 · Danh sách người dùng",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/admin/users",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "FR-12 · Tạo người dùng",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/users",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{newUsername}}\",\n  \"fullName\": \"Độc giả mới\",\n  \"password\": \"{{newPassword}}\",\n  \"role\": \"USER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-12 · Cập nhật người dùng",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/users/{{userId}}",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{newUsername}}\",\n  \"fullName\": \"Độc giả đã cập nhật\",\n  \"role\": \"USER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "FR-12 · Xóa người dùng không có lịch sử",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/admin/users/{{userId}}",
+        "description": "Authorization: admin. Use the Postman cookie jar; run Login first."
+      }
+    },
+    {
+      "name": "Kiểm tra DB readiness",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health",
+        "description": "Authorization: public. Use the Postman cookie jar; run Login first."
+      }
+    }
+  ]
+}

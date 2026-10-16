@@ -1,0 +1,32 @@
+# Truy vết SRS 1.0
+
+Prefix API: `/api/v1`. Tất cả dữ liệu đọc/ghi từ MySQL. Kiểm tra trong `tests/api.test.js` chạy với database `_test` riêng; `tests/browser.mjs` xác minh UI bằng Chromium thật.
+
+| Yêu cầu              | API                              | Giao diện                        | Kiểm tra đã triển khai                                                                                                                                |
+| -------------------- | -------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-01                | POST /auth/register              | Đăng ký độc giả                  | Đăng ký hợp lệ, thiếu trường, trùng username, role injection                                                                                          |
+| FR-02                | POST /auth/login                 | Đăng nhập User/Admin             | Đúng/sai mật khẩu, không tồn tại, cookie HttpOnly/SameSite                                                                                            |
+| FR-03                | GET /books                       | Tủ sách, tìm/lọc/sort/phân trang | Có kết quả, rỗng, page sai; browser tìm sách                                                                                                          |
+| FR-04                | GET /books/:id                   | Modal chi tiết                   | Có sách, ID sai, không tồn tại; browser mở chi tiết                                                                                                   |
+| FR-05                | POST /borrow-requests            | Form ngày mượn/trả               | Hợp lệ, ngày bằng/trước/sai lịch, sách không tồn tại, spoof userId, duplicate pending; browser gửi                                                    |
+| FR-06                | GET /me                          | Hồ sơ cá nhân                    | Đúng người dùng, không auth, không hash; browser profile                                                                                              |
+| FR-07                | GET /me/borrow-requests          | Sách của tôi, lọc trạng thái     | Cách ly lịch sử, lịch sử rỗng, status sai; browser history                                                                                            |
+| FR-08                | POST /auth/logout                | Nút đăng xuất                    | Session vô hiệu ngay; browser logout                                                                                                                  |
+| FR-09                | GET /admin/stats                 | Tổng quan                        | User bị 403, Admin hợp lệ, tổng sách khớp DB; browser dashboard                                                                                       |
+| FR-10                | /admin/books CRUD                | Quản lý sách                     | Create, trùng mã, âm/vượt tồn, sửa giữ số đang mượn, xóa có/không lịch sử; browser create/delete                                                      |
+| FR-11                | GET/PATCH /admin/borrow-requests | Queue và modal quyết định        | Duyệt, từ chối, terminal 409, cạn tồn giữ PENDING, đồng thời cùng request và hai request tranh cuốn cuối, rollback giả lập lỗi audit; browser approve |
+| FR-12                | /admin/users CRUD                | Quản lý người dùng               | List/create/update/delete, duplicate, FK, tự xóa; browser mở danh sách                                                                                |
+| BR-01/02/03/04       | Auth/middleware                  | Theo role                        | Unique, role injection, ownership, 403 toàn nhóm Admin                                                                                                |
+| BR-05/06             | Borrow create                    | Form ngày                        | Ngày hợp lệ, PENDING, không giảm tồn                                                                                                                  |
+| BR-07/08/09/10/12/13 | Borrow review                    | Modal quyết định                 | Transaction, atomicity, exactly-once, terminal rejection                                                                                              |
+| BR-11/15             | FK                               | Thông báo xung đột               | Unknown ID và xóa có lịch sử                                                                                                                          |
+| BR-14                | Auth Admin                       | Khu quản trị                     | Review route bắt buộc Admin, role lấy mới từ DB mỗi request                                                                                           |
+| BR-16/17/18          | Borrow create                    | Form mượn                        | Không giới hạn sách/ngày, chặn PENDING trùng theo quyết định người dùng                                                                               |
+| NFR-SEC-02/03/04/05  | Security/validation              | Lỗi tiếng Việt                   | Scrypt, server role, public user model, validation, không stack, Origin rejection                                                                     |
+| NFR-DATA-01/02       | InnoDB/FK/CHECK                  | —                                | Transaction/locks, rollback, constraints                                                                                                              |
+| NFR-LOG-01/02/03     | audit_logs/requestId             | —                                | Audit quyết định đúng một lần; không lưu mật khẩu/raw session trong audit                                                                             |
+| NFR-MNT-01/02        | API/error handler                | Thông báo lỗi                    | /api/v1, success/error envelope, status HTTP                                                                                                          |
+
+## Phần chưa được nghiệm thu
+
+HTTPS production (NFR-SEC-01), p95/concurrency/SLA, backup/restore/RPO/RTO và log retention chưa có mục tiêu hoặc cấu hình vận hành trong SRS. Không tính các mục này là đạt. Kiểm thử hiện tại không thay thế penetration test, load test hay nghiệm thu của chủ sản phẩm. Chi tiết lựa chọn xem `decisions.md`.

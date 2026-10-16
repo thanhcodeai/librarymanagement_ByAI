@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: library_management
+      MYSQL_USER: library
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env}
+    ports:
+      - '127.0.0.1:3307:3306'
+    volumes:
+      - library_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost --silent']
+      interval: 3s
+      retries: 40
+volumes:
+  library_data:
