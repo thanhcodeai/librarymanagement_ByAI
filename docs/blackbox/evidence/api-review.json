@@ -1,0 +1,221 @@
+{
+  "timestamp": "2026-10-23T02:09:48.840Z",
+  "database": "library_blackbox_review_test",
+  "results": [
+    {
+      "id": "BB2-001",
+      "name": "Đăng ký hợp lệ",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-002",
+      "name": "Thiếu username",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-003",
+      "name": "Thiếu fullName",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-004",
+      "name": "Thiếu password",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-005",
+      "name": "username = \"repeat(a,0)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-006",
+      "name": "username = \"repeat(a,1)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-007",
+      "name": "username = \"repeat(a,2)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-008",
+      "name": "username = \"repeat(a,63)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-009",
+      "name": "username = \"repeat(a,64)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-010",
+      "name": "username = \"repeat(a,65)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-011",
+      "name": "password = \"repeat(a,7)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-012",
+      "name": "password = \"repeat(a,8)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-013",
+      "name": "password = \"repeat(a,9)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-014",
+      "name": "password = \"repeat(a,127)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-015",
+      "name": "password = \"repeat(a,128)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-016",
+      "name": "password = \"repeat(a,129)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-017",
+      "name": "fullName = \"repeat(a,0)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-018",
+      "name": "fullName = \"repeat(a,1)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-019",
+      "name": "fullName = \"repeat(a,2)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-020",
+      "name": "fullName = \"repeat(a,149)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-021",
+      "name": "fullName = \"repeat(a,150)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-022",
+      "name": "fullName = \"repeat(a,151)\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-023",
+      "name": "username = \"abc def\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-024",
+      "name": "username = \"abc@def\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-025",
+      "name": "username = \"a-Z_0.9-\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-026",
+      "name": "Đăng ký trùng username",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-027",
+      "name": "Đăng ký trùng email",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-028",
+      "name": "email = \"<OMIT>\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-029",
+      "name": "email = \"\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-030",
+      "name": "email = null",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-031",
+      "name": "email = \"bb{RUN}@example.com\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-032",
+      "name": "email = \"abc@\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-033",
+      "name": "Chèn role ADMIN khi đăng ký",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-084",
+      "name": "borrowDate = \"2027-02-29\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-085",
+      "name": "borrowDate = \"2028-02-30\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-086",
+      "name": "borrowDate = \"31/12/2028\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-087",
+      "name": "borrowDate = \"\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-088",
+      "name": "dueDate = \"2027-02-29\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-089",
+      "name": "dueDate = \"2028-02-30\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-090",
+      "name": "dueDate = \"31/12/2028\"",
+      "status": "PASS"
+    },
+    {
+      "id": "BB2-091",
+      "name": "dueDate = \"\"",
+      "status": "PASS"
+    },
+    {
+      "id": "OBS-SORT",
+      "name": "newest vẫn theo tạo mới sau sửa sách cũ",
+      "status": "PASS"
+    },
+    {
+      "id": "OBS-EMAIL-LOGIN",
+      "name": "API đăng nhập bằng email dài hơn 64",
+      "status": "PASS"
+    }
+  ]
+}

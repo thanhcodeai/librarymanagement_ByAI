@@ -47,6 +47,15 @@ def validation(old, fr, field, values, base, endpoint, source, pre='GUEST', good
         else:
             expected = 'success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.'
             verify = '4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.'
+        if endpoint.endswith('/auth/register'):
+            verify = '4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.'
+            if not valid:
+                expected = 'success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.'
+        if endpoint.endswith('/admin/books'):
+            verify = ('4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.' if valid else '4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.')
+        if endpoint.endswith('/borrow-requests'):
+            expected = 'success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.'
+            verify = '4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.'
         if endpoint.endswith('/auth/login'):
             expected = 'success=false; error.code=VALIDATION_ERROR; GET /me bằng cùng jar trả 401.'
             verify = '4. GET /me bằng cùng jar.'
@@ -58,7 +67,7 @@ def validation(old, fr, field, values, base, endpoint, source, pre='GUEST', good
 
 add('BB-001','FR-01','Đăng ký hợp lệ','GUEST; username/email mới','REG','1. POST /auth/register với REG.\n2. GET /admin/users bằng A1, q=username.','201','success=true; data.username/fullName/email đúng; data.role=USER; không có password/hash.',REG)
 for field in ['username','fullName','password']:
-    add('BB-002','FR-01',f'Thiếu {field}','GUEST',f'REG bỏ khóa {field}','1. POST /auth/register.\n2. A1 tìm username trong danh sách users.','400','VALIDATION_ERROR; không tạo tài khoản.',REG)
+    add('BB-002','FR-01',f'Thiếu {field}','GUEST',f'REG bỏ khóa {field}','1. POST /auth/register.\n2. A1 GET /admin/users?q={RUN}, duyệt mọi trang; không có ID mới thuộc marker RUN.','400','VALIDATION_ERROR; không tạo tài khoản.',REG)
 for field, lens, maximum, old in [('username',[0,1,2,63,64,65],64,'BB-003'),('password',[7,8,9,127,128,129],128,'BB-005'),('fullName',[0,1,2,149,150,151],150,'BB-006')]:
     validation(old,'FR-01',field,[(f'repeat(a,{n})', 1<=n<=maximum if field!='password' else 8<=n<=maximum) for n in lens], 'REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức', 'POST /auth/register', REG, 'GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng')
 for value, valid in [('abc def',False),('abc@def',False),('a-Z_0.9-',True)]:
@@ -187,16 +196,31 @@ for width,height in [(1440,1060),(390,844)]:
         add('BB-064','UI',f'Bố cục {role} {width}x{height}',f'Browser Chromium; {role} có tài khoản hợp lệ; B1 tồn tại',f'Viewport {width}x{height}', '1. Đăng nhập đúng vai trò.\n2. Mở danh sách, tìm B1, mở chi tiết.\n3. '+('Mở menu quản trị, màn hình quản lý sách.' if role=='ADMIN' else 'Mở Sách của tôi và Hồ sơ.')+'\n4. Kiểm tra cuộn ngang, nút và nội dung bị che.', 'N/A (UI)', 'document.documentElement.scrollWidth <= innerWidth; đọc được nội dung; điều khiển dùng được; dialog đóng được; không có pageerror mới.','README: responsive desktop/mobile')
 add('BB-064','UI','Phản hồi form thiếu dữ liệu','GUEST; Chromium desktop','Form đăng ký để trống username, các trường còn lại hợp lệ','1. Mở Đăng ký.\n2. Điền các trường còn lại.\n3. Bấm Đăng ký.','N/A (UI)','Không tạo tài khoản; validation chỉ ra trường bắt buộc (native browser hoặc thông báo ứng dụng); vẫn ở form, không hiện lỗi kỹ thuật.','OpenAPI: Register.required; UI đăng ký')
 
+# SRS original document review: add missing explicit obligations, keep old IDs stable.
+for path,fr in [('/me','FR-06'),('/me/borrow-requests','FR-07')]:
+    add('SRS-review',fr,'Guest bị chặn '+path,'GUEST',f'GET {path}','1. GET không kèm cookie.','401','UNAUTHENTICATED; không trả hồ sơ/lịch sử.','SRS FR-06/07; BR-03; HTTP conventions',priority='P0')
+add('SRS-review','FR-05','Guest không tạo được yêu cầu','GUEST; B1 tồn tại','BORROW','1. POST /borrow-requests không cookie.\n2. A1 kiểm tra danh sách requests.','401','UNAUTHENTICATED; không tạo yêu cầu, tồn không đổi.','SRS FR-05; BR-11',priority='P0')
+add('SRS-review','FR-06','Session không hợp lệ','Cookie library_session=invalidtoken; không phải cookie thật','GET /me','1. GET /me kèm cookie giả.','401','UNAUTHENTICATED; không lộ hồ sơ.','SRS FR-06; NFR-SEC-04',priority='P0')
+add('SRS-review','FR-02','Đăng nhập API bằng email','U1 có email=bb{RUN}@example.com đã cấu hình','LOGIN username=email U1, password=P','1. POST /auth/login bằng jar mới.\n2. GET /me.','200; GET: 200','data.user.id=U1; /me đúng U1; có phiên hợp lệ.','SRS FR-02: username/email + password',priority='P0')
+add('SRS-review','FR-02','Đăng nhập UI bằng email dài hơn 64','A1 tạo U1 có email=repeat(a,60)+@ui{RUN}.example.com; tổng 83 ký tự; browser Chromium; bắt đầu GUEST','Email 83 ký tự hợp lệ; password=P của U1','1. Xác nhận API LOGIN với email này trả 200 rồi logout.\n2. Mở form đăng nhập bằng browser.\n3. Nhập đầy đủ email bằng thao tác bàn phím; nhập password.\n4. Bấm Đăng nhập; quan sát giá trị ô, HTTP và màn hình.','API: 200; UI LOGIN: 200; /me: 200','Ô đăng nhập giữ đủ 83 ký tự; đăng nhập thành công, vào Khám phá sách; /me đúng U1. Không sửa kỳ vọng thành 401 theo lỗi hiện tại.','SRS FR-02; dictionary email VARCHAR(254); OpenAPI Login.username max254',priority='P0')
+for method in ['POST','PUT']:
+    add('SRS-review','FR-12',method+' role không hợp lệ','A1; U2 là USER còn tồn tại','REG mới role=INVALID' if method=='POST' else 'USERPUT U2 role=INVALID',f'1. {method} '+('/admin/users.' if method=='POST' else '/admin/users/{U2}.')+'\n2. Đọc lại danh sách/đối tượng.','400','VALIDATION_ERROR; không tạo mới; không đổi role/thuộc tính U2.','SRS FR-12 ngoại lệ role invalid; role USER/ADMIN')
+add('SRS-review','FR-01','JSON không hợp lệ','GUEST','Content-Type application/json; raw body={"username":','1. POST /auth/register với raw body đúng như trên, không dùng JSON serializer tự sửa.','400','error.code=INVALID_JSON; success=false; không lộ stack/SQL.','SRS HTTP conventions; NFR-MNT-02; NFR-SEC-04/05')
+add('SRS-review','FR-07','Phân trang lịch sử sai','U1','GET /me/borrow-requests?page=0','1. Gửi GET bằng U1.','400','VALIDATION_ERROR; không trả danh sách thành công.','SRS FR-07 ngoại lệ pagination invalid; OpenAPI page minimum1')
+
 QUESTIONS = [
  ['Q-01','Mới cập nhật / sort=newest','UI ghi Mới cập nhật nhưng static review API cho thấy sắp theo ID tạo mới; OpenAPI chỉ nêu enum.','Cần chủ sản phẩm xác định theo thời điểm tạo hay thời điểm sửa, chiều và quy tắc bằng nhau. Không biến hành vi hiện tại thành chuẩn. Chưa có TC nghiệm thu sort=newest.'],
  ['Q-02','Query ngoài hợp đồng','userId không nằm trong query của /me/borrow-requests.','Bắt buộc không lộ dữ liệu U2; cần chốt HTTP 400 hoặc bỏ qua với 200. Chưa đưa biến thể này vào bộ TC thực thi cho tới khi chốt HTTP.'],
  ['Q-03','ADMIN cuối cùng','Quy tắc có trong decisions.md; không thể dựng tình huống một ADMIN hợp lệ hạ/xóa ADMIN cuối khác chỉ bằng luồng công khai mà không đồng thời vi phạm tự bảo vệ.','Đã có TC tự bảo vệ; không tuyên bố đã phủ riêng mọi nhánh last-admin. Cần thiết kế quyền nhiều ADMIN/fixture ngoài phạm vi hộp đen trước khi bổ sung.'],
- ['Q-04','SRS gốc và giới hạn triển khai','Không có SRS gốc trong checkout. Static review thấy giới hạn totalQuantity 1.000.000, ID và độ dài category/description trong mã chưa đầy đủ trong OpenAPI.','Không tự thêm các giới hạn này làm chuẩn nghiệm thu. Đối chiếu/phê duyệt SRS và hợp đồng API rồi bổ sung biên trên.'],
+ ['Q-04','Giới hạn triển khai ngoài SRS','Đã nhận SRS v1.0 ngày 16/10/2026. SRS dùng BIGINT UNSIGNED trong dictionary; code dùng INT và path max2147483647; totalQuantity max1.000.000 và description max10.000 chưa được chốt trong SRS.','Đây là khác biệt thiết kế/contract cần xác nhận, không tự gắn thành requirement đã được duyệt.'],
+ ['Q-06','TBD của SRS so với decisions.md','SRS vẫn để TBD: auth/session/expiry, password, email, quyền Guest, Admin mượn, duplicate pending, quyền sửa tồn và tự quản lý ADMIN. decisions.md ghi các lựa chọn triển khai; SRS tải lên chưa cập nhật chúng.','TC của các chính sách này chỉ là kiểm tra contract/cấu hình hiện tại, chưa đủ để kết luận đạt SRS nếu thiếu phê duyệt thay đổi yêu cầu.'],
+ ['Q-07','Mâu thuẫn quyền lịch sử Admin trong SRS','API catalog ghi /me/borrow-requests: User; authorization matrix ghi Admin được own borrow history. Code chỉ yêu cầu auth nên Admin cũng gọi được.','Cần chốt và cập nhật SRS; chưa kết luận code vi phạm ở mục này.'],
  ['Q-05','NFR và audit/rollback','Chưa có ngưỡng SLA/p95/RPO/RTO hoặc API đọc audit và cơ chế gây lỗi hạ tầng được hỗ trợ.','Không đánh dấu các yêu cầu này đạt. Bộ hiện tại không thay thế load test, penetration test, kiểm thử khôi phục hoặc kiểm thử hộp trắng rollback.']
 ]
 GUIDE = [
- ['Phiên bản','2.0 — sửa bộ cũ sau review. ID BB2-xxx mới; cột ID cũ giữ liên hệ BB-001…064. Số lượng tăng do tách đầu vào và thêm nhánh còn thiếu.'],
- ['Trạng thái','Tất cả Chưa chạy. Chỉ rà soát thiết kế và kiểm tra cấu trúc file; không lấy kết quả API/browser trước đây làm kết quả bộ mới.'],
+ ['Nguồn SRS','Đặc tả yêu cầu phần mềm website quản lý thư viện — SRS.docx; v1.0 ngày 16/10/2026; SHA-256 a440fa65c73192e27e82b27dee6a8bbef78505d31ae98023388250db3356e703. Chỉ lưu metadata/trích dẫn mục; không tự đưa file người dùng đính kèm lên GitHub.'],
+ ['Phiên bản','2.1 — đã đối chiếu SRS gốc do người dùng cung cấp và code tại acdb8a9. ID BB2-xxx mới; cột ID cũ giữ liên hệ BB-001…064. Số lượng tăng do tách đầu vào và thêm nhánh còn thiếu.'],
+ ['Trạng thái','Các TC giữ Chưa chạy để không lẫn hồ sơ thực thi với mẫu thiết kế. Lượt review ngày 23/10/2026 đã chạy 19 tests có sẵn, browser workflow và 43 checks bổ trợ; có lỗi UI email xác nhận. Xem sheet Kiem chung và srs-code-review.md, không suy ra toàn bộ TC đã Pass.'],
  ['BASE','Môi trường test riêng, dữ liệu không phải production. Node/MySQL/app đã sẵn sàng; không có người ghi đồng thời trừ ca concurrency. MIN_PASSWORD_LENGTH=8, SESSION_HOURS=8, BLOCK_DUPLICATE_PENDING=true. Mỗi ca fixture mới, không phụ thuộc ca trước.'],
  ['API','Mọi path trong TC có prefix /api/v1; Content-Type application/json cho body. GUEST là jar rỗng. U1/U2 là hai USER khác nhau, A1 là ADMIN. A1 chuẩn bị dữ liệu, người thực hiện request mục tiêu theo tiền điều kiện.'],
  ['RUN','RUN là 8 ký tự chữ/số duy nhất mỗi ca. {ID} lấy từ phản hồi tạo fixture. repeat(a,n) là CHUỖI gồm đúng n ký tự a, không phải biểu thức gửi nguyên văn. <OMIT> nghĩa là bỏ khóa JSON. Ca chuỗi 1 ký tự phải chọn ký tự còn trống hoặc fixture cô lập.'],
@@ -212,7 +236,7 @@ GUIDE = [
  ['CLEANUP','Đối tượng tạo thành công chưa có lịch sử: A1 DELETE sách/user thử sau ca. Có lịch sử: chỉ giữ trong môi trường test riêng; muốn reset phải dùng cơ chế môi trường test được cho phép, không xóa volume/DB có dữ liệu cần giữ. Không để cleanup làm mất bằng chứng.'],
  ['Thứ tự chạy','Chuẩn bị fixture độc lập, chạy P0 trước P1. Rate limit dùng instance/IP riêng hoặc chạy cuối. Hết hạn session cần 8 giờ, đánh dấu Chưa chạy/Blocked nếu chưa chờ đủ.'],
  ['Phân loại kết quả','Pass: mọi assertion đạt. Fail: sai khác có bằng chứng. Blocked: thiếu fixture/công cụ/đặc tả. Chưa chạy: chưa thực hiện. Các mục chưa chốt nằm riêng ở sheet Cần làm rõ, chưa tính là TC thực thi.'],
- ['Phạm vi','Bao phủ FR-01…FR-12 theo tài liệu hiện có, không tuyên bố bao phủ toàn bộ SRS chưa có. Không gồm trả sách, gia hạn, phạt, thanh toán. Bộ này thiên về API hộp đen, có các ca UI riêng; không thay thế UAT toàn bộ màn hình.'],
+ ['Phạm vi','Đã đọc SRS v1.0 ngày 16/10/2026 do người dùng cung cấp (SHA-256 trong srs-code-review.md). Phủ các nhóm FR-01…12 nhưng vẫn còn mục TBD/NFR chưa được nghiệm thu. Không gồm trả sách, gia hạn, phạt, thanh toán. Bộ này thiên về API hộp đen, có các ca UI riêng; không thay thế UAT toàn bộ màn hình.'],
  ['Sinh lại file','python docs/blackbox/generate_workbook.py (cần openpyxl). Script chỉ sinh CSV/Markdown/Excel, không chạy ứng dụng hoặc sửa mã ứng dụng.']
 ]
 
@@ -230,20 +254,72 @@ def style(ws, widths, height=100):
     ws.sheet_view.zoomScale=80
 
 
+CODE_REFS = {
+ 'FR-01':'server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm',
+ 'FR-02':'server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm',
+ 'FR-03':'server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog',
+ 'FR-04':'server/app.js:293; src/main.jsx:979 BookDetail',
+ 'FR-05':'server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm',
+ 'FR-06':'server/app.js:129 (auth), :250 (/me); src/main.jsx:1709 Profile',
+ 'FR-07':'server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests',
+ 'FR-08':'server/app.js:235 logout; src/main.jsx:195 logout',
+ 'FR-09':'server/app.js:400 stats; src/main.jsx:1374 Dashboard',
+ 'FR-10':'server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm',
+ 'FR-11':'server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm',
+ 'FR-12':'server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm'
+}
+def alignment(row):
+    old, fr, name = row[1], row[2], row[3]
+    refs = '; '.join(CODE_REFS[k] for k in CODE_REFS if k in fr)
+    basis = 'SRS '+fr+'; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.'
+    extra = {
+      'BB-004':'SRS không chốt regex username; theo OpenAPI hiện tại.',
+      'BB-005':'SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.',
+      'BB-008':'SRS FR-01 / TBD-USER-01 vẫn TBD; email tùy chọn/định dạng theo decisions.md.',
+      'BB-009':'SRS FR-01: duy nhất nếu email bật; cấu hình bật theo decisions.md.',
+      'BB-011':'SRS FR-02; cookie session là lựa chọn bổ sung TBD-AUTH-01, không phải yêu cầu JWT bắt buộc.',
+      'BB-014':'Rate-limit100/15 phút từ decisions.md; SRS không ấn định con số.',
+      'BB-015':'SRS TBD-BOOK-01: quyền Guest chưa chốt; TC401 theo decisions.md.',
+      'BB-017':'SRS checklist: search case/accent chưa chốt; TC theo decisions.md.',
+      'BB-020':'SRS chỉ nêu sort; chiều A-Z/available theo nhãn UI và OpenAPI. newest tách Q-01.',
+      'BB-021':'SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.',
+      'BB-022':'Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.',
+      'BB-031':'SRS BR-18 / TBD-BORROW-03 còn TBD; chặn trùng là decisions.md.',
+      'BB-032':'SRS authorization matrix để TBD Admin mượn; TC403 theo decisions.md.',
+      'BB-037':'SRS FR-08 phụ thuộc cơ chế auth; thu hồi ngay theo session trong decisions.md.',
+      'BB-044':'SRS BR-10 quy định bất đẳng thức; quyền nhập available khi tạo vẫn TBD, TC theo decisions.md.',
+      'BB-045':'SRS BR-10; quy tắc sửa tổng giữ số đang mượn là decisions.md.',
+      'BB-057':'SRS không quy định cụ thể thu hồi session sau đổi password; theo OpenAPI/decisions.md.',
+      'BB-058':'SRS FR-12; thu hồi session sau đổi role theo OpenAPI; quản trị ADMIN khác còn TBD.',
+      'BB-059':'SRS FR-12 / TBD-ADMIN-01 còn TBD; tự bảo vệ ADMIN theo decisions.md.',
+      'BB-061':'SRS NFR-SEC-08 / TBD-AUTH-02 còn TBD; 8 giờ theo decisions.md.',
+      'BB-062':'SRS NFR-SEC; Origin check là cơ chế session/same-origin bổ sung trong decisions.md.',
+      'BB-064':'Ca UI bổ sung; SRS chưa chốt viewport 1440/390 hoặc tiêu chí responsive chi tiết.'
+    }
+    if old in extra:basis=extra[old]
+    if fr=='UI':refs='src/main.jsx:167 App, :648 Pagination, :676 Catalog; src/style.css'
+    if fr=='BR/Auth':refs='server/app.js:129 auth, :217 session expiry'
+    if fr=='BR/Security' and old=='BB-063':basis='SRS NFR-SEC-04/05 về input/error; ca SQL/HTML bổ trợ kiểm tra bảo mật web, không thay penetration test.'
+    if fr=='BR/Security':refs='server/app.js:13 helmet, :150 Origin, :251 listBooks, :638 error handler; src/main.jsx:676 Catalog'
+    if name=='Phân trang mặc định':basis='SRS checklist để pagination default TBD; default12 là decisions.md/OpenAPI.'
+    return [basis, refs]
+
 def main():
     ids=[r[0] for r in CASES]
     assert len(ids)==len(set(ids))
     assert all(len(r)==len(HEADERS) and all(r[i] for i in range(13)) for r in CASES)
     assert all(r[13]=='Chưa chạy' for r in CASES)
+    output_headers=HEADERS+['Căn cứ SRS / phạm vi','Vị trí đối chiếu code (tĩnh)']
+    output_cases=[r+alignment(r) for r in CASES]
     assert {f'BB-{i:03}' for i in range(1,65)} <= {r[1] for r in CASES}
     with (ROOT/'test-cases.csv').open('w',encoding='utf-8-sig',newline='') as f:
-        writer=csv.writer(f, lineterminator="\n");writer.writerow(HEADERS);writer.writerows(CASES)
+        writer=csv.writer(f, lineterminator="\n");writer.writerow(output_headers);writer.writerows(output_cases)
     wb=Workbook(); guide=wb.active;guide.title='Huong dan';guide.append(['Mục','Nội dung'])
     for r in GUIDE:guide.append(r)
     style(guide,[26,135],90)
-    ws=wb.create_sheet('Test cases');ws.append(HEADERS)
-    for r in CASES:ws.append(r)
-    style(ws,[15,15,18,42,12,24,50,68,65,85,35,90,60,18,50,20,45],150)
+    ws=wb.create_sheet('Test cases');ws.append(output_headers)
+    for r in output_cases:ws.append(r)
+    style(ws,[15,15,18,42,12,24,50,68,65,85,35,90,60,18,50,20,45,90,85],150)
     ws.freeze_panes='D2'
     val=DataValidation(type='list',formula1='"Chưa chạy,Pass,Fail,Blocked"');val.errorTitle='Trạng thái không hợp lệ';val.error='Chọn một trạng thái trong danh sách.';val.showErrorMessage=True;val.errorStyle='stop';ws.add_data_validation(val);val.add(f'N2:N{len(CASES)+1}')
     for row in ws.iter_rows(min_row=2):
@@ -255,17 +331,20 @@ def main():
     questions=wb.create_sheet('Can lam ro');questions.append(['ID','Chủ đề','Phát hiện','Xử lý'])
     for r in QUESTIONS:questions.append(r)
     style(questions,[15,35,85,100],110)
+    verification=wb.create_sheet('Kiem chung');verification.append(['Hạng mục','Kết quả / giới hạn'])
+    for r in [('SRS','Đã đọc bản gốc v1.0; có nhiều TBD và mâu thuẫn quyền Admin/history.'),('Build','PASS npm run build; warning chunk-size không chặn build.'),('Tests có sẵn','19/19 PASS; không phải toàn bộ bộ TC mới.'),('Browser có sẵn','PASS reader borrow, admin approve, CRUD book, users/profile/mobile; no pageerror.'),('Checks bổ trợ','43/43 assertions đạt; 33 registration, 8 invalid-date, 2 quan sát API. Hai quan sát không phải kết luận web đạt.'),('Lỗi web xác nhận','BUG-01: email83 ký tự đăng nhập API200; formmaxlength64 cắt còn64, UI401. TC BB2-222 kỳ vọng thành công, chưa sửa ứng dụng.'),('Sai lệch nhãn','BUG-02: newest có nhãn Mới cập nhật nhưng sắp id DESC; chờ chốt định nghĩa theo Q-01.'),('Giới hạn','Chưa chạy toàn bộ TC, rate-limit100/15 và phiên8giờ chưa chạy trong review. Không tự ghi Pass vào bộ mẫu. Bằng chứng trong evidence/ và srs-code-review.md.')]:verification.append(r)
+    style(verification,[30,145],85)
     wb.save(ROOT/'test-cases.xlsx')
     shutil.copyfile(ROOT/'test-cases.xlsx', ROOT.parent.parent/'TEST_CASE_HOP_DEN.xlsx')
     loaded=load_workbook(ROOT/'test-cases.xlsx');assert loaded['Test cases'].max_row==len(CASES)+1
     assert (ROOT/'test-cases.xlsx').read_bytes()==(ROOT.parent.parent/'TEST_CASE_HOP_DEN.xlsx').read_bytes()
-    md=['# Kiểm thử hộp đen — Lá Thư Viện, phiên bản 2.0','',f'**{len(CASES)} test case riêng biệt**, tất cả chưa chạy. Mỗi biến thể đầu vào có ID và ô kết quả riêng. Một TC có thể có nhiều bước đọc để kiểm tra cùng một hành vi.','', '[Tải Excel](test-cases.xlsx) · [CSV](test-cases.csv) · [Script sinh tài liệu](generate_workbook.py)','', 'Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy vết](../traceability.md), [README](../../README.md). Đối chiếu mã chỉ để phát hiện khoảng trống/mâu thuẫn; không lấy hành vi triển khai làm chuẩn thay SRS.','', '## Hướng dẫn','']
+    md=['# Kiểm thử hộp đen — Lá Thư Viện, phiên bản 2.1','',f'**{len(CASES)} test case riêng biệt**, tất cả chưa chạy. Mỗi biến thể đầu vào có ID và ô kết quả riêng. Một TC có thể có nhiều bước đọc để kiểm tra cùng một hành vi.','', '[Tải Excel](test-cases.xlsx) · [CSV](test-cases.csv) · [Script sinh tài liệu](generate_workbook.py)','', 'Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy vết](../traceability.md), [README](../../README.md). Đã đối chiếu SRS gốc v1.0 do người dùng gửi; xem [báo cáo SRS/code](srs-code-review.md). Đối chiếu mã để tìm khoảng trống/mâu thuẫn, không lấy hành vi triển khai làm chuẩn thay SRS.','', '## Hướng dẫn','']
     for key,value in GUIDE:md += [f'**{key}:** {value}','']
     md += ['## Điểm cần làm rõ','', '| ID | Chủ đề | Phát hiện | Xử lý |','| --- | --- | --- | --- |']
     for r in QUESTIONS:md.append('| '+' | '.join(r)+' |')
     md += ['', '## Test case','']
     for r in CASES:
-        md += [f'### {r[0]} — {r[3]}', '',f'- Truy vết: {r[2]}; ID cũ: {r[1]}; ưu tiên: {r[4]}; kỹ thuật: {r[5]}.',f'- Nguồn kỳ vọng: {r[6]}.',f'- Tiền điều kiện: {r[7]}.',f'- Dữ liệu: {r[8]}.','',r[9],'',f'**HTTP mong đợi:** {r[10]}.',f'**Kết quả mong đợi:** {r[11]}',f'**Hậu điều kiện/dọn dữ liệu:** {r[12]}','**Trạng thái:** Chưa chạy.','']
+        md += [f'### {r[0]} — {r[3]}', '',f'- Truy vết: {r[2]}; ID cũ: {r[1]}; ưu tiên: {r[4]}; kỹ thuật: {r[5]}.',f'- Nguồn kỳ vọng: {r[6]}.', f'- Căn cứ SRS/phạm vi: {alignment(r)[0]}', f'- Vị trí code đối chiếu tĩnh: {alignment(r)[1]}',f'- Tiền điều kiện: {r[7]}.',f'- Dữ liệu: {r[8]}.','',r[9],'',f'**HTTP mong đợi:** {r[10]}.',f'**Kết quả mong đợi:** {r[11]}',f'**Hậu điều kiện/dọn dữ liệu:** {r[12]}','**Trạng thái:** Chưa chạy.','']
     (ROOT/'test-plan.md').write_text('\n'.join(md),encoding='utf-8')
     report='''# Rà soát thiết kế test case — phiên bản 2.0
 

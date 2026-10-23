@@ -1,16 +1,18 @@
-# Kiểm thử hộp đen — Lá Thư Viện, phiên bản 2.0
+# Kiểm thử hộp đen — Lá Thư Viện, phiên bản 2.1
 
-**216 test case riêng biệt**, tất cả chưa chạy. Mỗi biến thể đầu vào có ID và ô kết quả riêng. Một TC có thể có nhiều bước đọc để kiểm tra cùng một hành vi.
+**226 test case riêng biệt**, tất cả chưa chạy. Mỗi biến thể đầu vào có ID và ô kết quả riêng. Một TC có thể có nhiều bước đọc để kiểm tra cùng một hành vi.
 
 [Tải Excel](test-cases.xlsx) · [CSV](test-cases.csv) · [Script sinh tài liệu](generate_workbook.py)
 
-Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy vết](../traceability.md), [README](../../README.md). Đối chiếu mã chỉ để phát hiện khoảng trống/mâu thuẫn; không lấy hành vi triển khai làm chuẩn thay SRS.
+Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy vết](../traceability.md), [README](../../README.md). Đã đối chiếu SRS gốc v1.0 do người dùng gửi; xem [báo cáo SRS/code](srs-code-review.md). Đối chiếu mã để tìm khoảng trống/mâu thuẫn, không lấy hành vi triển khai làm chuẩn thay SRS.
 
 ## Hướng dẫn
 
-**Phiên bản:** 2.0 — sửa bộ cũ sau review. ID BB2-xxx mới; cột ID cũ giữ liên hệ BB-001…064. Số lượng tăng do tách đầu vào và thêm nhánh còn thiếu.
+**Nguồn SRS:** Đặc tả yêu cầu phần mềm website quản lý thư viện — SRS.docx; v1.0 ngày 16/10/2026; SHA-256 a440fa65c73192e27e82b27dee6a8bbef78505d31ae98023388250db3356e703. Chỉ lưu metadata/trích dẫn mục; không tự đưa file người dùng đính kèm lên GitHub.
 
-**Trạng thái:** Tất cả Chưa chạy. Chỉ rà soát thiết kế và kiểm tra cấu trúc file; không lấy kết quả API/browser trước đây làm kết quả bộ mới.
+**Phiên bản:** 2.1 — đã đối chiếu SRS gốc do người dùng cung cấp và code tại acdb8a9. ID BB2-xxx mới; cột ID cũ giữ liên hệ BB-001…064. Số lượng tăng do tách đầu vào và thêm nhánh còn thiếu.
+
+**Trạng thái:** Các TC giữ Chưa chạy để không lẫn hồ sơ thực thi với mẫu thiết kế. Lượt review ngày 23/10/2026 đã chạy 19 tests có sẵn, browser workflow và 43 checks bổ trợ; có lỗi UI email xác nhận. Xem sheet Kiem chung và srs-code-review.md, không suy ra toàn bộ TC đã Pass.
 
 **BASE:** Môi trường test riêng, dữ liệu không phải production. Node/MySQL/app đã sẵn sàng; không có người ghi đồng thời trừ ca concurrency. MIN_PASSWORD_LENGTH=8, SESSION_HOURS=8, BLOCK_DUPLICATE_PENDING=true. Mỗi ca fixture mới, không phụ thuộc ca trước.
 
@@ -42,7 +44,7 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 **Phân loại kết quả:** Pass: mọi assertion đạt. Fail: sai khác có bằng chứng. Blocked: thiếu fixture/công cụ/đặc tả. Chưa chạy: chưa thực hiện. Các mục chưa chốt nằm riêng ở sheet Cần làm rõ, chưa tính là TC thực thi.
 
-**Phạm vi:** Bao phủ FR-01…FR-12 theo tài liệu hiện có, không tuyên bố bao phủ toàn bộ SRS chưa có. Không gồm trả sách, gia hạn, phạt, thanh toán. Bộ này thiên về API hộp đen, có các ca UI riêng; không thay thế UAT toàn bộ màn hình.
+**Phạm vi:** Đã đọc SRS v1.0 ngày 16/10/2026 do người dùng cung cấp (SHA-256 trong srs-code-review.md). Phủ các nhóm FR-01…12 nhưng vẫn còn mục TBD/NFR chưa được nghiệm thu. Không gồm trả sách, gia hạn, phạt, thanh toán. Bộ này thiên về API hộp đen, có các ca UI riêng; không thay thế UAT toàn bộ màn hình.
 
 **Sinh lại file:** python docs/blackbox/generate_workbook.py (cần openpyxl). Script chỉ sinh CSV/Markdown/Excel, không chạy ứng dụng hoặc sửa mã ứng dụng.
 
@@ -53,7 +55,9 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 | Q-01 | Mới cập nhật / sort=newest | UI ghi Mới cập nhật nhưng static review API cho thấy sắp theo ID tạo mới; OpenAPI chỉ nêu enum. | Cần chủ sản phẩm xác định theo thời điểm tạo hay thời điểm sửa, chiều và quy tắc bằng nhau. Không biến hành vi hiện tại thành chuẩn. Chưa có TC nghiệm thu sort=newest. |
 | Q-02 | Query ngoài hợp đồng | userId không nằm trong query của /me/borrow-requests. | Bắt buộc không lộ dữ liệu U2; cần chốt HTTP 400 hoặc bỏ qua với 200. Chưa đưa biến thể này vào bộ TC thực thi cho tới khi chốt HTTP. |
 | Q-03 | ADMIN cuối cùng | Quy tắc có trong decisions.md; không thể dựng tình huống một ADMIN hợp lệ hạ/xóa ADMIN cuối khác chỉ bằng luồng công khai mà không đồng thời vi phạm tự bảo vệ. | Đã có TC tự bảo vệ; không tuyên bố đã phủ riêng mọi nhánh last-admin. Cần thiết kế quyền nhiều ADMIN/fixture ngoài phạm vi hộp đen trước khi bổ sung. |
-| Q-04 | SRS gốc và giới hạn triển khai | Không có SRS gốc trong checkout. Static review thấy giới hạn totalQuantity 1.000.000, ID và độ dài category/description trong mã chưa đầy đủ trong OpenAPI. | Không tự thêm các giới hạn này làm chuẩn nghiệm thu. Đối chiếu/phê duyệt SRS và hợp đồng API rồi bổ sung biên trên. |
+| Q-04 | Giới hạn triển khai ngoài SRS | Đã nhận SRS v1.0 ngày 16/10/2026. SRS dùng BIGINT UNSIGNED trong dictionary; code dùng INT và path max2147483647; totalQuantity max1.000.000 và description max10.000 chưa được chốt trong SRS. | Đây là khác biệt thiết kế/contract cần xác nhận, không tự gắn thành requirement đã được duyệt. |
+| Q-06 | TBD của SRS so với decisions.md | SRS vẫn để TBD: auth/session/expiry, password, email, quyền Guest, Admin mượn, duplicate pending, quyền sửa tồn và tự quản lý ADMIN. decisions.md ghi các lựa chọn triển khai; SRS tải lên chưa cập nhật chúng. | TC của các chính sách này chỉ là kiểm tra contract/cấu hình hiện tại, chưa đủ để kết luận đạt SRS nếu thiếu phê duyệt thay đổi yêu cầu. |
+| Q-07 | Mâu thuẫn quyền lịch sử Admin trong SRS | API catalog ghi /me/borrow-requests: User; authorization matrix ghi Admin được own borrow history. Code chỉ yêu cầu auth nên Admin cũng gọi được. | Cần chốt và cập nhật SRS; chưa kết luận code vi phạm ở mục này. |
 | Q-05 | NFR và audit/rollback | Chưa có ngưỡng SLA/p95/RPO/RTO hoặc API đọc audit và cơ chế gây lỗi hạ tầng được hỗ trợ. | Không đánh dấu các yêu cầu này đạt. Bộ hiện tại không thay thế load test, penetration test, kiểm thử khôi phục hoặc kiểm thử hộp trắng rollback. |
 
 ## Test case
@@ -62,6 +66,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-001; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username/email mới.
 - Dữ liệu: REG.
 
@@ -77,11 +83,13 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-002; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG bỏ khóa username.
 
 1. POST /auth/register.
-2. A1 tìm username trong danh sách users.
+2. A1 GET /admin/users?q={RUN}, duyệt mọi trang; không có ID mới thuộc marker RUN.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** VALIDATION_ERROR; không tạo tài khoản.
@@ -92,11 +100,13 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-002; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG bỏ khóa fullName.
 
 1. POST /auth/register.
-2. A1 tìm username trong danh sách users.
+2. A1 GET /admin/users?q={RUN}, duyệt mọi trang; không có ID mới thuộc marker RUN.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** VALIDATION_ERROR; không tạo tài khoản.
@@ -107,11 +117,13 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-002; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG bỏ khóa password.
 
 1. POST /auth/register.
-2. A1 tìm username trong danh sách users.
+2. A1 GET /admin/users?q={RUN}, duyệt mọi trang; không có ID mới thuộc marker RUN.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** VALIDATION_ERROR; không tạo tài khoản.
@@ -122,16 +134,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-003; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất username bằng "repeat(a,0)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -139,13 +153,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-003; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất username bằng "repeat(a,1)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.username đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -156,13 +172,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-003; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất username bằng "repeat(a,2)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.username đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -173,13 +191,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-003; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất username bằng "repeat(a,63)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.username đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -190,13 +210,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-003; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất username bằng "repeat(a,64)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.username đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -207,16 +229,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-003; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất username bằng "repeat(a,65)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -224,16 +248,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-005; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất password bằng "repeat(a,7)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -241,13 +267,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-005; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất password bằng "repeat(a,8)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. POST /auth/login với tài khoản vừa tạo và mật khẩu đầu vào.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** 201; tài khoản mới được tạo. Đăng nhập bằng chính mật khẩu đầu vào trả 200; JSON không trả password/hash.
@@ -258,13 +286,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-005; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất password bằng "repeat(a,9)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. POST /auth/login với tài khoản vừa tạo và mật khẩu đầu vào.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** 201; tài khoản mới được tạo. Đăng nhập bằng chính mật khẩu đầu vào trả 200; JSON không trả password/hash.
@@ -275,13 +305,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-005; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất password bằng "repeat(a,127)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. POST /auth/login với tài khoản vừa tạo và mật khẩu đầu vào.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** 201; tài khoản mới được tạo. Đăng nhập bằng chính mật khẩu đầu vào trả 200; JSON không trả password/hash.
@@ -292,13 +324,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-005; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất password bằng "repeat(a,128)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. POST /auth/login với tài khoản vừa tạo và mật khẩu đầu vào.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** 201; tài khoản mới được tạo. Đăng nhập bằng chính mật khẩu đầu vào trả 200; JSON không trả password/hash.
@@ -309,16 +343,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-005; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-07 / TBD-SEC-01 vẫn TBD; 8–128 theo decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất password bằng "repeat(a,129)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -326,16 +362,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-006; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất fullName bằng "repeat(a,0)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -343,13 +381,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-006; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất fullName bằng "repeat(a,1)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.fullName đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -360,13 +400,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-006; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất fullName bằng "repeat(a,2)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.fullName đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -377,13 +419,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-006; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất fullName bằng "repeat(a,149)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.fullName đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -394,13 +438,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-006; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất fullName bằng "repeat(a,150)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.fullName đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -411,16 +457,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-006; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username một ký tự cần bảo đảm chưa tồn tại; cô lập từng ca để tránh trùng.
 - Dữ liệu: REG mới; repeat(a,n) là chuỗi n ký tự a, không phải chuỗi biểu thức; thay duy nhất fullName bằng "repeat(a,151)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -428,16 +476,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-004; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS không chốt regex username; theo OpenAPI hiện tại.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username thử chưa tồn tại.
 - Dữ liệu: REG; thay duy nhất username bằng "abc def".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -445,16 +495,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-004; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS không chốt regex username; theo OpenAPI hiện tại.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username thử chưa tồn tại.
 - Dữ liệu: REG; thay duy nhất username bằng "abc@def".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -462,13 +514,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-004; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS không chốt regex username; theo OpenAPI hiện tại.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; username thử chưa tồn tại.
 - Dữ liệu: REG; thay duy nhất username bằng "a-Z_0.9-".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.username đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -479,6 +533,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-007; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; U1 có email hợp lệ.
 - Dữ liệu: REG mới nhưng username trùng U1.
 
@@ -494,6 +550,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-009; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01: duy nhất nếu email bật; cấu hình bật theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; U1 có email hợp lệ.
 - Dữ liệu: REG mới nhưng email trùng U1.
 
@@ -509,13 +567,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-008; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01 / TBD-USER-01 vẫn TBD; email tùy chọn/định dạng theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG; <OMIT> nghĩa là bỏ khóa; thay duy nhất email bằng "<OMIT>".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET /admin/users?q=username, xác nhận đúng ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.email=null.
@@ -526,13 +586,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-008; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01 / TBD-USER-01 vẫn TBD; email tùy chọn/định dạng theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG; <OMIT> nghĩa là bỏ khóa; thay duy nhất email bằng "".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET /admin/users?q=username, xác nhận đúng ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.email=null.
@@ -543,13 +605,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-008; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01 / TBD-USER-01 vẫn TBD; email tùy chọn/định dạng theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG; <OMIT> nghĩa là bỏ khóa; thay duy nhất email bằng null.
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET /admin/users?q=username, xác nhận đúng ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.email=null.
@@ -560,13 +624,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-008; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01 / TBD-USER-01 vẫn TBD; email tùy chọn/định dạng theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG; <OMIT> nghĩa là bỏ khóa; thay duy nhất email bằng "bb{RUN}@example.com".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 GET /admin/users?q=username, xác nhận đúng ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.email đúng địa chỉ đã gửi.
@@ -577,16 +643,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-008; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01 / TBD-USER-01 vẫn TBD; email tùy chọn/định dạng theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG; <OMIT> nghĩa là bỏ khóa; thay duy nhất email bằng "abc@".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /auth/register.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /admin/users?q={RUN}, duyệt mọi trang (marker nằm trong username hoặc fullName không bị thay); đối chiếu ID trước/sau.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không có ID tài khoản mới thuộc marker RUN.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -594,6 +662,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-01; ID cũ: BB-010; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register; decisions.md: tài khoản/email/mật khẩu.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: REG thêm role=ADMIN.
 
@@ -609,6 +679,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-011; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-02; cookie session là lựa chọn bổ sung TBD-AUTH-01, không phải yêu cầu JWT bắt buộc.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; tài khoản USER có mật khẩu thử đã biết.
 - Dữ liệu: LOGIN của USER.
 
@@ -625,6 +697,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-011; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-02; cookie session là lựa chọn bổ sung TBD-AUTH-01, không phải yêu cầu JWT bắt buộc.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST; tài khoản ADMIN có mật khẩu thử đã biết.
 - Dữ liệu: LOGIN của ADMIN.
 
@@ -641,6 +715,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-012; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: LOGIN U1 nhưng password sai.
 
@@ -656,6 +732,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-012; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: LOGIN username chữ/số xác nhận không tồn tại.
 
@@ -671,6 +749,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-013; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Login.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: LOGIN; <OMIT> nghĩa là bỏ khóa; thay duy nhất username bằng "".
 
@@ -688,6 +768,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-013; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Login.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: LOGIN; <OMIT> nghĩa là bỏ khóa; thay duy nhất username bằng "<OMIT>".
 
@@ -705,6 +787,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-013; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Login.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: LOGIN; <OMIT> nghĩa là bỏ khóa; thay duy nhất password bằng "".
 
@@ -722,6 +806,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-013; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Login.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; GUEST.
 - Dữ liệu: LOGIN; <OMIT> nghĩa là bỏ khóa; thay duy nhất password bằng "<OMIT>".
 
@@ -739,6 +825,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-02; ID cũ: BB-014; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: decisions.md: 100 yêu cầu/15 phút/IP trên nhóm auth.
+- Căn cứ SRS/phạm vi: Rate-limit100/15 phút từ decisions.md; SRS không ấn định con số.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
 - Tiền điều kiện: BASE; Instance test riêng đã khởi động; chưa có request /auth từ IP thử; không có runner khác dùng IP này.
 - Dữ liệu: 101 POST /auth/login cùng IP; LOGIN sai mật khẩu, đúng cấu trúc.
 
@@ -754,6 +842,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-015; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS TBD-BOOK-01: quyền Guest chưa chốt; TC401 theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; GUEST; B1 tồn tại.
 - Dữ liệu: GET /books.
 
@@ -768,6 +858,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-04; ID cũ: BB-015; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS TBD-BOOK-01: quyền Guest chưa chốt; TC401 theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:293; src/main.jsx:979 BookDetail
 - Tiền điều kiện: BASE; GUEST; B1 tồn tại.
 - Dữ liệu: GET /books/{B1}.
 
@@ -782,6 +874,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-016; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tìm chuỗi con; OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo B1 với title=Sach{RUN} Alpha, author=Tacgia{RUN}, bookCode=CODE{RUN}.
 - Dữ liệu: GET /books?q=Sach{RUN}.
 
@@ -797,6 +891,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-016; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tìm chuỗi con; OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo B1 với title=Sach{RUN} Alpha, author=Tacgia{RUN}, bookCode=CODE{RUN}.
 - Dữ liệu: GET /books?q=Tacgia{RUN}.
 
@@ -812,6 +908,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-016; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tìm chuỗi con; OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo B1 với title=Sach{RUN} Alpha, author=Tacgia{RUN}, bookCode=CODE{RUN}.
 - Dữ liệu: GET /books?q=CODE{RUN}.
 
@@ -827,6 +925,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-017; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tìm không phân biệt hoa/dấu.
+- Căn cứ SRS/phạm vi: SRS checklist: search case/accent chưa chốt; TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo B1 title=Thư viện {RUN}.
 - Dữ liệu: GET /books?q=THU VIEN {RUN}.
 
@@ -841,6 +941,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-017; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tìm không phân biệt hoa/dấu.
+- Căn cứ SRS/phạm vi: SRS checklist: search case/accent chưa chốt; TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo B1 title=Thư viện {RUN}.
 - Dữ liệu: GET /books?q=thu vien {RUN}.
 
@@ -855,6 +957,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-018; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 xác nhận không có sách khớp chuỗi chữ/số này.
 - Dữ liệu: GET /books?q=ZZZ{RUN}NoMatch999.
 
@@ -869,6 +973,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-019; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo B1/B2 có cùng token Sach{RUN}, category lần lượt CAT{RUN}A/CAT{RUN}B.
 - Dữ liệu: GET /books?q=Sach{RUN}&category=CAT{RUN}A.
 
@@ -883,6 +989,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-020; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: UI: Tên sách A → Z / Còn nhiều nhất; OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS chỉ nêu sort; chiều A-Z/available theo nhãn UI và OpenAPI. newest tách Q-01.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo 3 sách category=SORT{RUN}, title Aaa/Bbb/Ccc{RUN}, số khả dụng lần lượt 1/3/2.
 - Dữ liệu: GET /books?category=SORT{RUN}&sort=title.
 
@@ -898,6 +1006,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-020; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: UI: Tên sách A → Z / Còn nhiều nhất; OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS chỉ nêu sort; chiều A-Z/available theo nhãn UI và OpenAPI. newest tách Q-01.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo 3 sách category=SORT{RUN}, title Aaa/Bbb/Ccc{RUN}, số khả dụng lần lượt 1/3/2.
 - Dữ liệu: GET /books?category=SORT{RUN}&sort=available.
 
@@ -913,6 +1023,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?page=0.
 
@@ -927,6 +1039,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?page=1.
 
@@ -941,6 +1055,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?page=2.
 
@@ -955,6 +1071,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?pageSize=0.
 
@@ -969,6 +1087,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?pageSize=1.
 
@@ -983,6 +1103,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?pageSize=2.
 
@@ -997,6 +1119,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?pageSize=99.
 
@@ -1011,6 +1135,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?pageSize=100.
 
@@ -1025,6 +1151,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-021; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS nêu pagination invalid; ngưỡng1/100 từ decisions.md/OpenAPI, không phải con số SRS.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất 3 sách.
 - Dữ liệu: GET /books?pageSize=101.
 
@@ -1039,6 +1167,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?q=repeat(a,254).
 
@@ -1054,6 +1184,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?q=repeat(a,255).
 
@@ -1069,6 +1201,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?q=repeat(a,256).
 
@@ -1084,6 +1218,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?category=repeat(a,99).
 
@@ -1099,6 +1235,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?category=repeat(a,100).
 
@@ -1114,6 +1252,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?category=repeat(a,101).
 
@@ -1129,6 +1269,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: BB-022; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: Giới hạn query/enum từ OpenAPI; SRS nêu query phải hợp lệ.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1.
 - Dữ liệu: GET /books?sort=invalid.
 
@@ -1143,6 +1285,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo chính xác 5 sách trong category=PAGE{RUN}, title A/B/C/D/E{RUN}; không ghi dữ liệu đồng thời.
 - Dữ liệu: GET /books?category=PAGE{RUN}&sort=title&page=1&pageSize=2.
 
@@ -1158,6 +1302,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo chính xác 5 sách trong category=PAGE{RUN}, title A/B/C/D/E{RUN}; không ghi dữ liệu đồng thời.
 - Dữ liệu: GET /books?category=PAGE{RUN}&sort=title&page=2&pageSize=2.
 
@@ -1173,6 +1319,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo chính xác 5 sách trong category=PAGE{RUN}, title A/B/C/D/E{RUN}; không ghi dữ liệu đồng thời.
 - Dữ liệu: GET /books?category=PAGE{RUN}&sort=title&page=3&pageSize=2.
 
@@ -1188,6 +1336,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS FR-03; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; A1 tạo chính xác 5 sách trong category=PAGE{RUN}, title A/B/C/D/E{RUN}; không ghi dữ liệu đồng thời.
 - Dữ liệu: GET /books?category=PAGE{RUN}&sort=title&page=4&pageSize=2.
 
@@ -1203,6 +1353,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-03; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: query parameters page/pageSize/q/category/sort.
+- Căn cứ SRS/phạm vi: SRS checklist để pagination default TBD; default12 là decisions.md/OpenAPI.
+- Vị trí code đối chiếu tĩnh: server/app.js:70 (paging), :251 listBooks; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; ít nhất 13 sách.
 - Dữ liệu: GET /books không gửi page/pageSize.
 
@@ -1217,6 +1369,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-04; ID cũ: BB-023; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /books/{id}.
+- Căn cứ SRS/phạm vi: SRS FR-04; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:293; src/main.jsx:979 BookDetail
 - Tiền điều kiện: BASE; U1; B1 tồn tại; MISSING_ID không tồn tại.
 - Dữ liệu: GET /books/{B1}.
 
@@ -1231,6 +1385,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-04; ID cũ: BB-023; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /books/{id}.
+- Căn cứ SRS/phạm vi: SRS FR-04; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:293; src/main.jsx:979 BookDetail
 - Tiền điều kiện: BASE; U1; B1 tồn tại; MISSING_ID không tồn tại.
 - Dữ liệu: GET /books/{MISSING_ID}.
 
@@ -1245,6 +1401,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-04; ID cũ: BB-024; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /books/{id}.
+- Căn cứ SRS/phạm vi: SRS FR-04; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:293; src/main.jsx:979 BookDetail
 - Tiền điều kiện: BASE; U1; B1 tồn tại; MISSING_ID không tồn tại.
 - Dữ liệu: GET /books/0.
 
@@ -1259,6 +1417,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-04; ID cũ: BB-024; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /books/{id}.
+- Căn cứ SRS/phạm vi: SRS FR-04; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:293; src/main.jsx:979 BookDetail
 - Tiền điều kiện: BASE; U1; B1 tồn tại; MISSING_ID không tồn tại.
 - Dữ liệu: GET /books/-1.
 
@@ -1273,6 +1433,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-04; ID cũ: BB-024; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /books/{id}.
+- Căn cứ SRS/phạm vi: SRS FR-04; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:293; src/main.jsx:979 BookDetail
 - Tiền điều kiện: BASE; U1; B1 tồn tại; MISSING_ID không tồn tại.
 - Dữ liệu: GET /books/abc.
 
@@ -1287,6 +1449,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-025; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 total=2, available=2; không có PENDING U1/B1.
 - Dữ liệu: BORROW.
 
@@ -1302,6 +1466,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-026; ưu tiên: P0; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW, dueDate=D-1.
 
@@ -1317,6 +1483,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-026; ưu tiên: P0; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW, dueDate=D.
 
@@ -1332,6 +1500,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-026; ưu tiên: P0; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW, dueDate=D+1.
 
@@ -1347,16 +1517,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất borrowDate bằng "2027-02-29".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1364,16 +1536,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất borrowDate bằng "2028-02-30".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1381,16 +1555,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất borrowDate bằng "31/12/2028".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1398,16 +1574,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất borrowDate bằng "".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1415,16 +1593,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất dueDate bằng "2027-02-29".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1432,16 +1612,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất dueDate bằng "2028-02-30".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1449,16 +1631,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất dueDate bằng "31/12/2028".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1466,16 +1650,18 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-027; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW; trường ngày còn lại hợp lệ (2028-01-01 hoặc 2029-01-01 để bảo đảm thứ tự nếu ngày hợp lệ); thay duy nhất dueDate bằng "".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /borrow-requests.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. U1 GET /me/borrow-requests và GET /books/{B1}; đối chiếu lịch sử/tồn trước khi gửi.
 
 **HTTP mong đợi:** 400.
-**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
+**Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; lịch sử U1 không có yêu cầu mới; tồn B1 không đổi.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
 
@@ -1483,6 +1669,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-028; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW với borrowDate=2028-02-29, dueDate=2028-03-01.
 
@@ -1498,6 +1686,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-029; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; MISSING_ID không tồn tại.
 - Dữ liệu: BORROW bookId=MISSING_ID.
 
@@ -1513,6 +1703,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-030; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW thêm userId={U2}.
 
@@ -1528,6 +1720,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-030; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW thêm status=APPROVED.
 
@@ -1543,6 +1737,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-030; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; B1 mới, không có PENDING.
 - Dữ liệu: BORROW thêm reviewedBy={A1}.
 
@@ -1558,6 +1754,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-031; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS BR-18 / TBD-BORROW-03 còn TBD; chặn trùng là decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; U1; đã có đúng một R1 PENDING của U1/B1.
 - Dữ liệu: BORROW cùng B1.
 
@@ -1573,6 +1771,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05; ID cũ: BB-032; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS authorization matrix để TBD Admin mượn; TC403 theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
 - Tiền điều kiện: BASE; A1; B1 tồn tại.
 - Dữ liệu: BORROW.
 
@@ -1587,6 +1787,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05/FR-11; ID cũ: BB-054; ưu tiên: P1; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05/FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm; server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; U1; yêu cầu cũ U1/B1 đã APPROVED; không còn PENDING U1/B1.
 - Dữ liệu: BORROW.
 
@@ -1602,6 +1804,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-05/FR-11; ID cũ: BB-054; ưu tiên: P1; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-05/FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm; server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; U1; yêu cầu cũ U1/B1 đã DENIED; không còn PENDING U1/B1.
 - Dữ liệu: BORROW.
 
@@ -1617,6 +1821,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-06; ID cũ: BB-033; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-06; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:129 (auth), :250 (/me); src/main.jsx:1709 Profile
 - Tiền điều kiện: BASE; U1 và U2 có phiên riêng.
 - Dữ liệu: GET /me bằng U1.
 
@@ -1631,6 +1837,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-06; ID cũ: BB-033; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-06; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:129 (auth), :250 (/me); src/main.jsx:1709 Profile
 - Tiền điều kiện: BASE; U1 và U2 có phiên riêng.
 - Dữ liệu: GET /me bằng U2.
 
@@ -1645,6 +1853,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-07; ID cũ: BB-034; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
 - Tiền điều kiện: BASE; U1/U2 có lịch sử riêng và cookie riêng.
 - Dữ liệu: GET /me/borrow-requests bằng U1.
 
@@ -1659,6 +1869,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-07; ID cũ: BB-035; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /me/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
 - Tiền điều kiện: BASE; U1 có ít nhất một yêu cầu mỗi trạng thái hợp lệ.
 - Dữ liệu: GET /me/borrow-requests?status=PENDING.
 
@@ -1673,6 +1885,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-07; ID cũ: BB-035; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /me/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
 - Tiền điều kiện: BASE; U1 có ít nhất một yêu cầu mỗi trạng thái hợp lệ.
 - Dữ liệu: GET /me/borrow-requests?status=APPROVED.
 
@@ -1687,6 +1901,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-07; ID cũ: BB-035; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /me/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
 - Tiền điều kiện: BASE; U1 có ít nhất một yêu cầu mỗi trạng thái hợp lệ.
 - Dữ liệu: GET /me/borrow-requests?status=DENIED.
 
@@ -1701,6 +1917,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-07; ID cũ: BB-035; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /me/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
 - Tiền điều kiện: BASE; U1 có ít nhất một yêu cầu mỗi trạng thái hợp lệ.
 - Dữ liệu: GET /me/borrow-requests?status=INVALID.
 
@@ -1715,6 +1933,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-07; ID cũ: BB-036; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /me/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
 - Tiền điều kiện: BASE; USER mới U0 chưa có yêu cầu.
 - Dữ liệu: GET /me/borrow-requests bằng U0.
 
@@ -1729,6 +1949,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-08; ID cũ: BB-037; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-08 phụ thuộc cơ chế auth; thu hồi ngay theo session trong decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:235 logout; src/main.jsx:195 logout
 - Tiền điều kiện: BASE; U1 có phiên còn hạn; giữ bản cookie chỉ trong HTTP client cục bộ.
 - Dữ liệu: POST /auth/logout; GET /me với chính cookie cũ.
 
@@ -1744,6 +1966,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-09; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-09; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:400 stats; src/main.jsx:1374 Dashboard
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1759,6 +1983,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-09; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-09; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:400 stats; src/main.jsx:1374 Dashboard
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1774,6 +2000,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1789,6 +2017,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1804,6 +2034,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: BOOK mới.
 
@@ -1819,6 +2051,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: BOOK mới.
 
@@ -1834,6 +2068,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: BOOK giữ mã B1; title mới.
 
@@ -1849,6 +2085,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: BOOK giữ mã B1; title mới.
 
@@ -1864,6 +2102,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body; B1 chưa có lịch sử.
 
@@ -1879,6 +2119,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body; B1 chưa có lịch sử.
 
@@ -1894,6 +2136,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1909,6 +2153,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1924,6 +2170,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: decision=APPROVE; R1 PENDING còn tồn.
 
@@ -1939,6 +2187,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: decision=APPROVE; R1 PENDING còn tồn.
 
@@ -1954,6 +2204,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1969,6 +2221,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body.
 
@@ -1984,6 +2238,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: REG mới; role=USER.
 
@@ -1999,6 +2255,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: REG mới; role=USER.
 
@@ -2014,6 +2272,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: USERPUT U2, fullName mới.
 
@@ -2029,6 +2289,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: USERPUT U2, fullName mới.
 
@@ -2044,6 +2306,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; GUEST; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body; U2 chưa có lịch sử.
 
@@ -2059,6 +2323,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-038; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; U1; A1 chuẩn bị B1/R1/U2 phù hợp và ghi mốc đối tượng; Content-Type JSON, Origin hợp lệ.
 - Dữ liệu: Không body; U2 chưa có lịch sử.
 
@@ -2074,6 +2340,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-09; ID cũ: BB-038; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /admin/stats; UI: Tổng quan.
+- Căn cứ SRS/phạm vi: SRS FR-09; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:400 stats; src/main.jsx:1374 Dashboard
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: GET /admin/stats.
 
@@ -2088,6 +2356,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-09; ID cũ: BB-039; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tồn kho; UI: Tổng quan.
+- Căn cứ SRS/phạm vi: SRS FR-09; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:400 stats; src/main.jsx:1374 Dashboard
 - Tiền điều kiện: BASE; A1; không có người ghi đồng thời; lấy S0 từ GET stats.
 - Dữ liệu: BOOK mới total=3, available mặc định.
 
@@ -2103,6 +2373,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-09; ID cũ: BB-039; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: tạo yêu cầu không giảm tồn; UI: Tổng quan.
+- Căn cứ SRS/phạm vi: SRS FR-09; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:400 stats; src/main.jsx:1374 Dashboard
 - Tiền điều kiện: BASE; A1/U1; B1 còn tồn; không trùng PENDING; không có ghi đồng thời; lấy S0.
 - Dữ liệu: BORROW bằng U1.
 
@@ -2118,6 +2390,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-09; ID cũ: BB-039; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-09; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:400 stats; src/main.jsx:1374 Dashboard
 - Tiền điều kiện: BASE; A1; R1 PENDING còn tồn; không ghi đồng thời; lấy S0.
 - Dữ liệu: decision=APPROVE.
 
@@ -2133,6 +2407,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-040; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK; totalQuantity=2; bỏ availableQuantity.
 
@@ -2148,6 +2424,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-041; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 đã tồn tại.
 - Dữ liệu: BOOK có bookCode trùng B1.
 
@@ -2163,13 +2441,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất bookCode bằng "repeat(a,0)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2180,13 +2460,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất bookCode bằng "repeat(a,1)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.bookCode đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2197,13 +2479,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất bookCode bằng "repeat(a,2)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.bookCode đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2214,13 +2498,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất bookCode bằng "repeat(a,49)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.bookCode đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2231,13 +2517,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất bookCode bằng "repeat(a,50)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.bookCode đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2248,13 +2536,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất bookCode bằng "repeat(a,51)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2265,13 +2555,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất title bằng "repeat(a,0)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2282,13 +2574,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất title bằng "repeat(a,1)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.title đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2299,13 +2593,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất title bằng "repeat(a,2)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.title đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2316,13 +2612,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất title bằng "repeat(a,254)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.title đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2333,13 +2631,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất title bằng "repeat(a,255)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.title đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2350,13 +2650,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất title bằng "repeat(a,256)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2367,13 +2669,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất author bằng "repeat(a,0)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2384,13 +2688,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất author bằng "repeat(a,1)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.author đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2401,13 +2707,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất author bằng "repeat(a,2)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.author đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2418,13 +2726,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất author bằng "repeat(a,254)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.author đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2435,13 +2745,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất author bằng "repeat(a,255)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 GET danh sách users hoặc GET /books/{ID mới} tùy đối tượng để xác nhận dữ liệu.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.author đúng giá trị đã gửi; các trường khác đúng dữ liệu nền; không lộ password/hash.
@@ -2452,13 +2764,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-042; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; cô lập ca một ký tự để không trùng mã.
 - Dữ liệu: BOOK mới; repeat(a,n) là n ký tự a; thay duy nhất author bằng "repeat(a,256)".
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2469,13 +2783,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-043; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; bỏ availableQuantity; thay duy nhất totalQuantity bằng -1.
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2486,13 +2802,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-043; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; bỏ availableQuantity; thay duy nhất totalQuantity bằng 0.
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. GET /books/{ID mới} bằng A1, xác nhận totalQuantity và availableQuantity.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.totalQuantity=0; data.availableQuantity=0; mã/tên/tác giả đúng BOOK.
@@ -2503,13 +2821,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-043; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; bỏ availableQuantity; thay duy nhất totalQuantity bằng 1.
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. GET /books/{ID mới} bằng A1, xác nhận totalQuantity và availableQuantity.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.totalQuantity=1; data.availableQuantity=1; mã/tên/tác giả đúng BOOK.
@@ -2520,13 +2840,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-043; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; bỏ availableQuantity; thay duy nhất totalQuantity bằng 2.
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. GET /books/{ID mới} bằng A1, xác nhận totalQuantity và availableQuantity.
+4. GET /books/{ID mới} bằng A1; đối chiếu các trường và tổng/tồn.
 
 **HTTP mong đợi:** 201.
 **Kết quả mong đợi:** data.totalQuantity=2; data.availableQuantity=2; mã/tên/tác giả đúng BOOK.
@@ -2537,13 +2859,15 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-043; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; bỏ availableQuantity; thay duy nhất totalQuantity bằng 1.5.
 
 1. Chuẩn bị dữ liệu nền mới.
 2. Gửi POST /admin/books.
 3. Đọc phản hồi.
-4. A1 tìm đúng username hoặc bookCode mới qua danh sách công khai phù hợp, xác nhận không có ID mới.
+4. A1 GET /books?category=CAT{RUN}, duyệt mọi trang; danh sách vẫn rỗng, không có ID sách mới.
 
 **HTTP mong đợi:** 400.
 **Kết quả mong đợi:** success=false; error.code=VALIDATION_ERROR; không tạo/sửa đối tượng.
@@ -2554,6 +2878,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-044; ưu tiên: P1; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10 quy định bất đẳng thức; quyền nhập available khi tạo vẫn TBD, TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; totalQuantity=2; availableQuantity=-1.
 
@@ -2569,6 +2895,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-044; ưu tiên: P1; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10 quy định bất đẳng thức; quyền nhập available khi tạo vẫn TBD, TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; totalQuantity=2; availableQuantity=0.
 
@@ -2584,6 +2912,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-044; ưu tiên: P1; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10 quy định bất đẳng thức; quyền nhập available khi tạo vẫn TBD, TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; totalQuantity=2; availableQuantity=1.
 
@@ -2599,6 +2929,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-044; ưu tiên: P1; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10 quy định bất đẳng thức; quyền nhập available khi tạo vẫn TBD, TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; totalQuantity=2; availableQuantity=2.
 
@@ -2614,6 +2946,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-044; ưu tiên: P1; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10 quy định bất đẳng thức; quyền nhập available khi tạo vẫn TBD, TC theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: BOOK mới; totalQuantity=2; availableQuantity=3.
 
@@ -2629,6 +2963,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-045; ưu tiên: P0; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10; quy tắc sửa tổng giữ số đang mượn là decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 total=3, available=1; tạo 2 khoản APPROVED qua U1/U2; fixture mới cho mỗi ca.
 - Dữ liệu: BOOK đầy đủ giữ bookCode/title/author B1; totalQuantity=1; bỏ availableQuantity.
 
@@ -2644,6 +2980,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-045; ưu tiên: P0; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10; quy tắc sửa tổng giữ số đang mượn là decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 total=3, available=1; tạo 2 khoản APPROVED qua U1/U2; fixture mới cho mỗi ca.
 - Dữ liệu: BOOK đầy đủ giữ bookCode/title/author B1; totalQuantity=2; bỏ availableQuantity.
 
@@ -2659,6 +2997,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-045; ưu tiên: P0; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS BR-10; quy tắc sửa tổng giữ số đang mượn là decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 total=3, available=1; tạo 2 khoản APPROVED qua U1/U2; fixture mới cho mỗi ca.
 - Dữ liệu: BOOK đầy đủ giữ bookCode/title/author B1; totalQuantity=4; bỏ availableQuantity.
 
@@ -2674,6 +3014,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: Mới; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 total=3, available=1 với 2 khoản APPROVED.
 - Dữ liệu: BOOK B1 totalQuantity=4, availableQuantity=4 (đúng phải là 2).
 
@@ -2689,6 +3031,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-046; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 không có yêu cầu nào.
 - Dữ liệu: DELETE /admin/books/{B1}.
 
@@ -2704,6 +3048,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: BB-046; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BookWrite, /admin/books; decisions.md: tồn kho.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; B1 có yêu cầu DENIED.
 - Dữ liệu: DELETE /admin/books/{B1}.
 
@@ -2719,6 +3065,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-047; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING của U1/B1, B1.available=1; có thể tạo PENDING trước khi USER khác mượn cuốn cuối.
 - Dữ liệu: {"decision":"APPROVE","note":"Ghi chu APPROVE"}.
 
@@ -2735,6 +3083,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-048; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING của U1/B1, B1.available=1; có thể tạo PENDING trước khi USER khác mượn cuốn cuối.
 - Dữ liệu: {"decision":"DENY","note":"Ghi chu DENY"}.
 
@@ -2751,6 +3101,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-049; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING của U1/B1, B1.available=0; có thể tạo PENDING trước khi USER khác mượn cuốn cuối.
 - Dữ liệu: {"decision":"APPROVE","note":"Ghi chu APPROVE"}.
 
@@ -2767,6 +3119,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: Mới; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING của U1/B1, B1.available=0; có thể tạo PENDING trước khi USER khác mượn cuốn cuối.
 - Dữ liệu: {"decision":"DENY","note":"Ghi chu DENY"}.
 
@@ -2783,6 +3137,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-050; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 đã APPROVED; ghi trạng thái/metadata và tồn ban đầu.
 - Dữ liệu: decision=APPROVE; note=khongduocdoi.
 
@@ -2798,6 +3154,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-050; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 đã APPROVED; ghi trạng thái/metadata và tồn ban đầu.
 - Dữ liệu: decision=DENY; note=khongduocdoi.
 
@@ -2813,6 +3171,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-050; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 đã DENIED; ghi trạng thái/metadata và tồn ban đầu.
 - Dữ liệu: decision=APPROVE; note=khongduocdoi.
 
@@ -2828,6 +3188,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-050; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 đã DENIED; ghi trạng thái/metadata và tồn ban đầu.
 - Dữ liệu: decision=DENY; note=khongduocdoi.
 
@@ -2843,6 +3205,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-051; ưu tiên: P0; kỹ thuật: Chuyển trạng thái / Đồng thời.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1 có hai jar hợp lệ; R1 PENDING; B1.available=2.
 - Dữ liệu: Hai PATCH decision=APPROVE; cùng R1.
 
@@ -2859,6 +3223,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-052; ưu tiên: P0; kỹ thuật: Chuyển trạng thái / Đồng thời.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1 có hai jar hợp lệ; R1/R2 PENDING của U1/U2 cùng B1.available=1.
 - Dữ liệu: Hai PATCH APPROVE, một R1 và một R2.
 
@@ -2875,6 +3241,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-053; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING mới, B1.available=1.
 - Dữ liệu: decision=APPROVE; note=repeat(a,0) (chuỗi thực, không phải biểu thức).
 
@@ -2890,6 +3258,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-053; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING mới, B1.available=1.
 - Dữ liệu: decision=APPROVE; note=repeat(a,499) (chuỗi thực, không phải biểu thức).
 
@@ -2905,6 +3275,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-053; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING mới, B1.available=1.
 - Dữ liệu: decision=APPROVE; note=repeat(a,500) (chuỗi thực, không phải biểu thức).
 
@@ -2920,6 +3292,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-053; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING mới, B1.available=1.
 - Dữ liệu: decision=APPROVE; note=repeat(a,501) (chuỗi thực, không phải biểu thức).
 
@@ -2935,6 +3309,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: BB-053; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; R1 PENDING còn tồn.
 - Dữ liệu: decision=INVALID.
 
@@ -2949,6 +3325,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: BorrowCreate, BorrowDecision; decisions.md: mượn/xét duyệt.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; MISSING_ID chưa tồn tại.
 - Dữ liệu: PATCH /admin/borrow-requests/{MISSING_ID}; decision=APPROVE.
 
@@ -2963,6 +3341,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /admin/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; có ít nhất một yêu cầu mỗi trạng thái.
 - Dữ liệu: GET /admin/borrow-requests?status=PENDING.
 
@@ -2977,6 +3357,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /admin/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; có ít nhất một yêu cầu mỗi trạng thái.
 - Dữ liệu: GET /admin/borrow-requests?status=APPROVED.
 
@@ -2991,6 +3373,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-11; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: /admin/borrow-requests.
+- Căn cứ SRS/phạm vi: SRS FR-11; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348, :490, :491 (decisions); src/main.jsx:1191 Requests, :1318 DecisionForm
 - Tiền điều kiện: BASE; A1; có ít nhất một yêu cầu mỗi trạng thái.
 - Dữ liệu: GET /admin/borrow-requests?status=DENIED.
 
@@ -3005,6 +3389,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-055; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1.
 - Dữ liệu: REG mới; role=USER.
 
@@ -3020,6 +3406,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-055; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U2 tồn tại.
 - Dữ liệu: USERPUT U2; fullName=Ten Moi {RUN}; không gửi password.
 
@@ -3035,6 +3423,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-055; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U2 chưa có yêu cầu mượn, không phải ADMIN.
 - Dữ liệu: DELETE /admin/users/{U2}.
 
@@ -3051,6 +3441,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-056; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U1/U2 tồn tại, email khác nhau và không rỗng.
 - Dữ liệu: REG mới; thay username bằng giá trị U1.
 
@@ -3066,6 +3458,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-056; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U1/U2 tồn tại, email khác nhau và không rỗng.
 - Dữ liệu: REG mới; thay email bằng giá trị U1.
 
@@ -3081,6 +3475,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-056; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U1/U2 tồn tại, email khác nhau và không rỗng.
 - Dữ liệu: USERPUT U2; thay username bằng giá trị U1.
 
@@ -3096,6 +3492,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-056; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U1/U2 tồn tại, email khác nhau và không rỗng.
 - Dữ liệu: USERPUT U2; thay email bằng giá trị U1.
 
@@ -3111,6 +3509,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-057; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS không quy định cụ thể thu hồi session sau đổi password; theo OpenAPI/decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U1 có phiên còn hạn; biết mật khẩu thử cũ/mới khác nhau.
 - Dữ liệu: USERPUT U1 thêm password=P_NEW.
 
@@ -3128,6 +3528,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-058; ưu tiên: P0; kỹ thuật: Chuyển trạng thái.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; thu hồi session sau đổi role theo OpenAPI; quản trị ADMIN khác còn TBD.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U2 là USER có phiên còn hạn, không phải A1.
 - Dữ liệu: USERPUT U2; role=ADMIN.
 
@@ -3144,6 +3546,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-059; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12 / TBD-ADMIN-01 còn TBD; tự bảo vệ ADMIN theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; ít nhất hai ADMIN để kiểm riêng quy tắc tự bảo vệ.
 - Dữ liệu: Không body.
 
@@ -3159,6 +3563,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-059; ưu tiên: P0; kỹ thuật: Bảng quyết định.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12 / TBD-ADMIN-01 còn TBD; tự bảo vệ ADMIN theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; ít nhất hai ADMIN để kiểm riêng quy tắc tự bảo vệ.
 - Dữ liệu: USERPUT A1; role=USER.
 
@@ -3174,6 +3580,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: BB-060; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U2 có một yêu cầu DENIED.
 - Dữ liệu: DELETE /admin/users/{U2}.
 
@@ -3189,6 +3597,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: UserCreate/UserUpdate; decisions.md: quản trị người dùng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; U2 có mật khẩu thử đã biết và phiên còn hạn.
 - Dữ liệu: USERPUT U2 đổi fullName; bỏ password và role.
 
@@ -3205,6 +3615,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: operation tương ứng.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; MISSING_ID không tồn tại.
 - Dữ liệu: BOOK.
 
@@ -3219,6 +3631,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-10; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: operation tương ứng.
+- Căn cứ SRS/phạm vi: SRS FR-10; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:56 bookSchema, :413 create, :441 update, :481 delete; src/main.jsx:1102 BookForm
 - Tiền điều kiện: BASE; A1; MISSING_ID không tồn tại.
 - Dữ liệu: Không body.
 
@@ -3233,6 +3647,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: operation tương ứng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; MISSING_ID không tồn tại.
 - Dữ liệu: REG; role=USER.
 
@@ -3247,6 +3663,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: FR-12; ID cũ: Mới; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: operation tương ứng.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
 - Tiền điều kiện: BASE; A1; MISSING_ID không tồn tại.
 - Dữ liệu: Không body.
 
@@ -3261,6 +3679,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: BR/Auth; ID cũ: BB-061; ưu tiên: P1; kỹ thuật: Giá trị biên.
 - Nguồn kỳ vọng: OpenAPI: securitySchemes và security của operation; decisions.md: phân quyền/session.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-08 / TBD-AUTH-02 còn TBD; 8 giờ theo decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:129 auth, :217 session expiry
 - Tiền điều kiện: BASE; U1 có phiên mới; SESSION_HOURS=8; không đổi mật khẩu/role/logout; đồng hồ client/server đồng bộ.
 - Dữ liệu: GET /me cùng cookie tại t0+7h59m và t0+8h01m; t0 là thời điểm nhận LOGIN.
 
@@ -3277,6 +3697,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: BR/Security; ID cũ: BB-062; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: same-origin mutation.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC; Origin check là cơ chế session/same-origin bổ sung trong decisions.md.
+- Vị trí code đối chiếu tĩnh: server/app.js:13 helmet, :150 Origin, :251 listBooks, :638 error handler; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; B1 còn tồn; không trùng PENDING; HTTP client gửi cookie chủ động, không dựa vào browser SameSite.
 - Dữ liệu: BORROW; Origin=https://other.example.
 
@@ -3292,6 +3714,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: BR/Security; ID cũ: BB-063; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: decisions.md: LIKE chuỗi con, parameterized input.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-04/05 về input/error; ca SQL/HTML bổ trợ kiểm tra bảo mật web, không thay penetration test.
+- Vị trí code đối chiếu tĩnh: server/app.js:13 helmet, :150 Origin, :251 listBooks, :638 error handler; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; U1; có ít nhất một sách nhưng không có sách chứa chuỗi đầu vào.
 - Dữ liệu: GET /books?q=' OR 1=1 --.
 
@@ -3306,6 +3730,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: BR/Security; ID cũ: BB-063; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: traceability.md: NFR-SEC; UI hiển thị dữ liệu người dùng.
+- Căn cứ SRS/phạm vi: SRS NFR-SEC-04/05 về input/error; ca SQL/HTML bổ trợ kiểm tra bảo mật web, không thay penetration test.
+- Vị trí code đối chiếu tĩnh: server/app.js:13 helmet, :150 Origin, :251 listBooks, :638 error handler; src/main.jsx:676 Catalog
 - Tiền điều kiện: BASE; A1 tạo B1 riêng; U1 có browser mới.
 - Dữ liệu: BOOK title=<script>window.bbXssFlag=1</script>.
 
@@ -3322,6 +3748,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: UI; ID cũ: BB-064; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: README: responsive desktop/mobile.
+- Căn cứ SRS/phạm vi: Ca UI bổ sung; SRS chưa chốt viewport 1440/390 hoặc tiêu chí responsive chi tiết.
+- Vị trí code đối chiếu tĩnh: src/main.jsx:167 App, :648 Pagination, :676 Catalog; src/style.css
 - Tiền điều kiện: BASE; Browser Chromium; USER có tài khoản hợp lệ; B1 tồn tại.
 - Dữ liệu: Viewport 1440x1060.
 
@@ -3339,6 +3767,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: UI; ID cũ: BB-064; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: README: responsive desktop/mobile.
+- Căn cứ SRS/phạm vi: Ca UI bổ sung; SRS chưa chốt viewport 1440/390 hoặc tiêu chí responsive chi tiết.
+- Vị trí code đối chiếu tĩnh: src/main.jsx:167 App, :648 Pagination, :676 Catalog; src/style.css
 - Tiền điều kiện: BASE; Browser Chromium; ADMIN có tài khoản hợp lệ; B1 tồn tại.
 - Dữ liệu: Viewport 1440x1060.
 
@@ -3356,6 +3786,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: UI; ID cũ: BB-064; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: README: responsive desktop/mobile.
+- Căn cứ SRS/phạm vi: Ca UI bổ sung; SRS chưa chốt viewport 1440/390 hoặc tiêu chí responsive chi tiết.
+- Vị trí code đối chiếu tĩnh: src/main.jsx:167 App, :648 Pagination, :676 Catalog; src/style.css
 - Tiền điều kiện: BASE; Browser Chromium; USER có tài khoản hợp lệ; B1 tồn tại.
 - Dữ liệu: Viewport 390x844.
 
@@ -3373,6 +3805,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: UI; ID cũ: BB-064; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: README: responsive desktop/mobile.
+- Căn cứ SRS/phạm vi: Ca UI bổ sung; SRS chưa chốt viewport 1440/390 hoặc tiêu chí responsive chi tiết.
+- Vị trí code đối chiếu tĩnh: src/main.jsx:167 App, :648 Pagination, :676 Catalog; src/style.css
 - Tiền điều kiện: BASE; Browser Chromium; ADMIN có tài khoản hợp lệ; B1 tồn tại.
 - Dữ liệu: Viewport 390x844.
 
@@ -3390,6 +3824,8 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 - Truy vết: UI; ID cũ: BB-064; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
 - Nguồn kỳ vọng: OpenAPI: Register.required; UI đăng ký.
+- Căn cứ SRS/phạm vi: Ca UI bổ sung; SRS chưa chốt viewport 1440/390 hoặc tiêu chí responsive chi tiết.
+- Vị trí code đối chiếu tĩnh: src/main.jsx:167 App, :648 Pagination, :676 Catalog; src/style.css
 - Tiền điều kiện: BASE; GUEST; Chromium desktop.
 - Dữ liệu: Form đăng ký để trống username, các trường còn lại hợp lệ.
 
@@ -3399,5 +3835,172 @@ Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy v
 
 **HTTP mong đợi:** N/A (UI).
 **Kết quả mong đợi:** Không tạo tài khoản; validation chỉ ra trường bắt buộc (native browser hoặc thông báo ứng dụng); vẫn ở form, không hiện lỗi kỹ thuật.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-217 — Guest bị chặn /me
+
+- Truy vết: FR-06; ID cũ: SRS-review; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-06/07; BR-03; HTTP conventions.
+- Căn cứ SRS/phạm vi: SRS FR-06; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:129 (auth), :250 (/me); src/main.jsx:1709 Profile
+- Tiền điều kiện: BASE; GUEST.
+- Dữ liệu: GET /me.
+
+1. GET không kèm cookie.
+
+**HTTP mong đợi:** 401.
+**Kết quả mong đợi:** UNAUTHENTICATED; không trả hồ sơ/lịch sử.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-218 — Guest bị chặn /me/borrow-requests
+
+- Truy vết: FR-07; ID cũ: SRS-review; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-06/07; BR-03; HTTP conventions.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
+- Tiền điều kiện: BASE; GUEST.
+- Dữ liệu: GET /me/borrow-requests.
+
+1. GET không kèm cookie.
+
+**HTTP mong đợi:** 401.
+**Kết quả mong đợi:** UNAUTHENTICATED; không trả hồ sơ/lịch sử.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-219 — Guest không tạo được yêu cầu
+
+- Truy vết: FR-05; ID cũ: SRS-review; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-05; BR-11.
+- Căn cứ SRS/phạm vi: SRS FR-05; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:300 (dates), :308 (create); src/main.jsx:1018 BorrowForm
+- Tiền điều kiện: BASE; GUEST; B1 tồn tại.
+- Dữ liệu: BORROW.
+
+1. POST /borrow-requests không cookie.
+2. A1 kiểm tra danh sách requests.
+
+**HTTP mong đợi:** 401.
+**Kết quả mong đợi:** UNAUTHENTICATED; không tạo yêu cầu, tồn không đổi.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-220 — Session không hợp lệ
+
+- Truy vết: FR-06; ID cũ: SRS-review; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-06; NFR-SEC-04.
+- Căn cứ SRS/phạm vi: SRS FR-06; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:129 (auth), :250 (/me); src/main.jsx:1709 Profile
+- Tiền điều kiện: BASE; Cookie library_session=invalidtoken; không phải cookie thật.
+- Dữ liệu: GET /me.
+
+1. GET /me kèm cookie giả.
+
+**HTTP mong đợi:** 401.
+**Kết quả mong đợi:** UNAUTHENTICATED; không lộ hồ sơ.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-221 — Đăng nhập API bằng email
+
+- Truy vết: FR-02; ID cũ: SRS-review; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-02: username/email + password.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
+- Tiền điều kiện: BASE; U1 có email=bb{RUN}@example.com đã cấu hình.
+- Dữ liệu: LOGIN username=email U1, password=P.
+
+1. POST /auth/login bằng jar mới.
+2. GET /me.
+
+**HTTP mong đợi:** 200; GET: 200.
+**Kết quả mong đợi:** data.user.id=U1; /me đúng U1; có phiên hợp lệ.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-222 — Đăng nhập UI bằng email dài hơn 64
+
+- Truy vết: FR-02; ID cũ: SRS-review; ưu tiên: P0; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-02; dictionary email VARCHAR(254); OpenAPI Login.username max254.
+- Căn cứ SRS/phạm vi: SRS FR-02; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:168 (rate limit), :200 (login); src/main.jsx:507 AuthForm
+- Tiền điều kiện: BASE; A1 tạo U1 có email=repeat(a,60)+@ui{RUN}.example.com; tổng 83 ký tự; browser Chromium; bắt đầu GUEST.
+- Dữ liệu: Email 83 ký tự hợp lệ; password=P của U1.
+
+1. Xác nhận API LOGIN với email này trả 200 rồi logout.
+2. Mở form đăng nhập bằng browser.
+3. Nhập đầy đủ email bằng thao tác bàn phím; nhập password.
+4. Bấm Đăng nhập; quan sát giá trị ô, HTTP và màn hình.
+
+**HTTP mong đợi:** API: 200; UI LOGIN: 200; /me: 200.
+**Kết quả mong đợi:** Ô đăng nhập giữ đủ 83 ký tự; đăng nhập thành công, vào Khám phá sách; /me đúng U1. Không sửa kỳ vọng thành 401 theo lỗi hiện tại.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-223 — POST role không hợp lệ
+
+- Truy vết: FR-12; ID cũ: SRS-review; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-12 ngoại lệ role invalid; role USER/ADMIN.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
+- Tiền điều kiện: BASE; A1; U2 là USER còn tồn tại.
+- Dữ liệu: REG mới role=INVALID.
+
+1. POST /admin/users.
+2. Đọc lại danh sách/đối tượng.
+
+**HTTP mong đợi:** 400.
+**Kết quả mong đợi:** VALIDATION_ERROR; không tạo mới; không đổi role/thuộc tính U2.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-224 — PUT role không hợp lệ
+
+- Truy vết: FR-12; ID cũ: SRS-review; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-12 ngoại lệ role invalid; role USER/ADMIN.
+- Căn cứ SRS/phạm vi: SRS FR-12; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:539 list, :554 create, :568 update, :605 delete; src/main.jsx:1497 UserList, :1606 UserForm
+- Tiền điều kiện: BASE; A1; U2 là USER còn tồn tại.
+- Dữ liệu: USERPUT U2 role=INVALID.
+
+1. PUT /admin/users/{U2}.
+2. Đọc lại danh sách/đối tượng.
+
+**HTTP mong đợi:** 400.
+**Kết quả mong đợi:** VALIDATION_ERROR; không tạo mới; không đổi role/thuộc tính U2.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-225 — JSON không hợp lệ
+
+- Truy vết: FR-01; ID cũ: SRS-review; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS HTTP conventions; NFR-MNT-02; NFR-SEC-04/05.
+- Căn cứ SRS/phạm vi: SRS FR-01; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:37 (schemas), :186 (register); src/main.jsx:507 AuthForm
+- Tiền điều kiện: BASE; GUEST.
+- Dữ liệu: Content-Type application/json; raw body={"username":.
+
+1. POST /auth/register với raw body đúng như trên, không dùng JSON serializer tự sửa.
+
+**HTTP mong đợi:** 400.
+**Kết quả mong đợi:** error.code=INVALID_JSON; success=false; không lộ stack/SQL.
+**Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
+**Trạng thái:** Chưa chạy.
+
+### BB2-226 — Phân trang lịch sử sai
+
+- Truy vết: FR-07; ID cũ: SRS-review; ưu tiên: P1; kỹ thuật: Phân vùng tương đương.
+- Nguồn kỳ vọng: SRS FR-07 ngoại lệ pagination invalid; OpenAPI page minimum1.
+- Căn cứ SRS/phạm vi: SRS FR-07; chi tiết mã lỗi/trường JSON theo OpenAPI. Đối chiếu tĩnh, không đồng nghĩa TC đã chạy.
+- Vị trí code đối chiếu tĩnh: server/app.js:348 listRequests, :396 (own); src/main.jsx:1191 Requests
+- Tiền điều kiện: BASE; U1.
+- Dữ liệu: GET /me/borrow-requests?page=0.
+
+1. Gửi GET bằng U1.
+
+**HTTP mong đợi:** 400.
+**Kết quả mong đợi:** VALIDATION_ERROR; không trả danh sách thành công.
 **Hậu điều kiện/dọn dữ liệu:** Đọc lại đối tượng bằng API nếu có thay đổi. Giữ bằng chứng; dọn theo CLEANUP trong Hướng dẫn.
 **Trạng thái:** Chưa chạy.
