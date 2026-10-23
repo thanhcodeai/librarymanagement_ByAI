@@ -1,13 +1,13 @@
 ﻿ID,SRS,Test case,Tiền điều kiện / dữ liệu,Bước thực hiện,Kết quả mong đợi,Trạng thái,Kết quả thực tế,Ghi chú / bằng chứng
 TC-01,FR-01,Đăng ký hợp lệ,Chưa đăng nhập. Username=readerRUN chưa tồn tại; họ tên=Nguyễn An; mật khẩu thử=Abcd1234. Email có thể để trống theo cấu hình web.,"1. Bấm Đăng ký độc giả.
-2. Nhập dữ liệu trên, bấm Đăng ký.
+2. Nhập dữ liệu trên, bấm Tạo tài khoản.
 3. Đăng nhập tài khoản vừa tạo.",Thông báo đăng ký thành công; đăng nhập được và vào Khám phá sách với quyền độc giả.,Chưa chạy,,"Email tùy chọn và mật khẩu tối thiểu8 thuộc quyết định triển khai, SRS còn TBD."
 TC-02,FR-01,Bỏ trống trường bắt buộc,"Chưa đăng nhập; họ tên=Nguyễn An, mật khẩu thử=Abcd1234; bỏ trống tên đăng nhập.","1. Mở Đăng ký độc giả.
 2. Điền họ tên/mật khẩu, để trống tên đăng nhập.
-3. Bấm Đăng ký.",Không tạo tài khoản; form chỉ ra tên đăng nhập bắt buộc; không vào màn hình đã đăng nhập.,Chưa chạy,,
+3. Bấm Tạo tài khoản.",Không tạo tài khoản; form chỉ ra tên đăng nhập bắt buộc; không vào màn hình đã đăng nhập.,Chưa chạy,,
 TC-03,FR-01,Tên đăng nhập đã tồn tại,Chưa đăng nhập; đã có tài khoản readerRUN.,"1. Mở Đăng ký độc giả.
 2. Dùng username readerRUN, họ tên/mật khẩu hợp lệ.
-3. Bấm Đăng ký.",Hiện lỗi thông tin đã tồn tại; không tạo tài khoản thứ hai và không đổi tài khoản cũ.,Chưa chạy,,
+3. Bấm Tạo tài khoản.",Hiện lỗi thông tin đã tồn tại; không tạo tài khoản thứ hai và không đổi tài khoản cũ.,Chưa chạy,,
 TC-04,FR-02,Đăng nhập độc giả,U1 là tài khoản USER có mật khẩu thử đã biết; hiện chưa đăng nhập.,"1. Nhập username/mật khẩu đúng của U1.
 2. Bấm Đăng nhập.",Vào Khám phá sách; có Sách của tôi và Hồ sơ cá nhân; hiển thị đúng người đăng nhập.,Chưa chạy,,
 TC-05,FR-02,Đăng nhập quản trị viên,A1 là tài khoản ADMIN có mật khẩu thử đã biết; hiện chưa đăng nhập.,"1. Nhập username/mật khẩu đúng của A1.

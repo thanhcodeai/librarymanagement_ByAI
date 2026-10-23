@@ -1,0 +1,161 @@
+{
+  "run": "20261023022645-f74a15",
+  "startedAt": "2026-10-23T02:26:45.859Z",
+  "updatedAt": "2026-10-23T02:26:49.927Z",
+  "applicationCommit": "d4f2e3852cefad8a40037eee7af9b2d8fd2ed60b",
+  "baseURL": "http://127.0.0.1:3002",
+  "database": "library_blackbox_acceptance_test",
+  "node": "v24.19.0",
+  "browserVersion": "154.0.8037.57",
+  "viewport": {
+    "width": 1440,
+    "height": 1060
+  },
+  "plan": "docs/blackbox/simple-test-cases.csv",
+  "selectedCases": [
+    "TC-18",
+    "TC-27"
+  ],
+  "fixtures": {
+    "users": [
+      76
+    ],
+    "books": [
+      102
+    ],
+    "requests": []
+  },
+  "results": [
+    {
+      "id": "TC-18",
+      "requirement": "FR-09",
+      "name": "Thống kê cập nhật sau thêm sách",
+      "expected": "Đầu sách=N+1; tổng cuốn=M+2; không tự tăng số Chờ duyệt/Đã duyệt.",
+      "status": "Pass",
+      "start": "2026-10-23T02:26:46.361Z",
+      "finish": "2026-10-23T02:26:48.230Z",
+      "data": {
+        "before": {
+          "books": 99,
+          "copies": "289"
+        },
+        "bookCode": "STATSf74a15"
+      },
+      "actual": "Đầu sách 99→100; tổng cuốn 289→291; Chờ duyệt/Đã duyệt không đổi.",
+      "error": "",
+      "http": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/books",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/stats",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/borrow-requests",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/books",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/admin/books",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/books",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/stats",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/borrow-requests",
+          "status": 200
+        }
+      ],
+      "pageErrors": [],
+      "screenshots": [
+        "TC-18.png"
+      ]
+    },
+    {
+      "id": "TC-27",
+      "requirement": "FR-12",
+      "name": "Thêm người dùng",
+      "expected": "Có tài khoản mới, đúng họ tên/username và vai trò Độc giả; không hiển thị mật khẩu.",
+      "status": "Pass",
+      "start": "2026-10-23T02:26:48.239Z",
+      "finish": "2026-10-23T02:26:49.917Z",
+      "data": {
+        "username": "memberf74a15",
+        "fullName": "Tran B",
+        "role": "USER"
+      },
+      "actual": "Tạo user201; tìm đúng username/họ tên/role Độc giả; không trả mật khẩu.",
+      "error": "",
+      "http": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/books",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/stats",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/borrow-requests",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/users",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/admin/users",
+          "status": 201
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/users",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/users",
+          "status": 200
+        }
+      ],
+      "pageErrors": [],
+      "screenshots": [
+        "TC-27.png"
+      ]
+    }
+  ]
+}

@@ -45,7 +45,7 @@
 **Tiền điều kiện/dữ liệu:** Chưa đăng nhập. Username=readerRUN chưa tồn tại; họ tên=Nguyễn An; mật khẩu thử=Abcd1234. Email có thể để trống theo cấu hình web.
 
 1. Bấm Đăng ký độc giả.
-2. Nhập dữ liệu trên, bấm Đăng ký.
+2. Nhập dữ liệu trên, bấm Tạo tài khoản.
 3. Đăng nhập tài khoản vừa tạo.
 
 **Mong đợi:** Thông báo đăng ký thành công; đăng nhập được và vào Khám phá sách với quyền độc giả.
@@ -58,7 +58,7 @@
 
 1. Mở Đăng ký độc giả.
 2. Điền họ tên/mật khẩu, để trống tên đăng nhập.
-3. Bấm Đăng ký.
+3. Bấm Tạo tài khoản.
 
 **Mong đợi:** Không tạo tài khoản; form chỉ ra tên đăng nhập bắt buộc; không vào màn hình đã đăng nhập.
 **Trạng thái:** Chưa chạy.
@@ -70,7 +70,7 @@
 
 1. Mở Đăng ký độc giả.
 2. Dùng username readerRUN, họ tên/mật khẩu hợp lệ.
-3. Bấm Đăng ký.
+3. Bấm Tạo tài khoản.
 
 **Mong đợi:** Hiện lỗi thông tin đã tồn tại; không tạo tài khoản thứ hai và không đổi tài khoản cũ.
 **Trạng thái:** Chưa chạy.

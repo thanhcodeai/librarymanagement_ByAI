@@ -1,0 +1,15 @@
+{
+  "run": "20261023-final",
+  "counts": {
+    "Pass": 30
+  },
+  "total": 30,
+  "percentPass": 100.0,
+  "startLocal": "23/10/2026 09:24:58",
+  "finishLocal": "23/10/2026 09:26:49",
+  "rawEvidenceSHA256": "784308b76b9d4f9359839c5abbfd33c5412aafe3df2328264beb0fcacc1a9a85",
+  "runnerSHA256": "53bfe83548f9691e6c4551af0240dc4e98a06af5607405aeb4416d392a344b8c",
+  "planSHA256": "e47d9a448db546ea718793500fc082456c8b384206dcab1f887251b0b4891486",
+  "report": "bao-cao-ket-qua.md",
+  "applicationCommit": "d4f2e3852cefad8a40037eee7af9b2d8fd2ed60b"
+}
