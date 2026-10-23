@@ -1,10 +1,9 @@
 """Generate the manual black-box test specification; does not execute application tests.
 Run from any directory: python /workspace/librarymanagement_ByAI/docs/blackbox/generate_workbook.py
-Requires openpyxl. All outputs are written beside this file and at repository root.
+Requires openpyxl. All outputs are written beside this file. The short-suite generator owns the root Excel file.
 """
 import csv
 import json
-import shutil
 from collections import Counter
 from pathlib import Path
 from openpyxl import Workbook, load_workbook
@@ -335,9 +334,7 @@ def main():
     for r in [('SRS','Đã đọc bản gốc v1.0; có nhiều TBD và mâu thuẫn quyền Admin/history.'),('Build','PASS npm run build; warning chunk-size không chặn build.'),('Tests có sẵn','19/19 PASS; không phải toàn bộ bộ TC mới.'),('Browser có sẵn','PASS reader borrow, admin approve, CRUD book, users/profile/mobile; no pageerror.'),('Checks bổ trợ','43/43 assertions đạt; 33 registration, 8 invalid-date, 2 quan sát API. Hai quan sát không phải kết luận web đạt.'),('Lỗi web xác nhận','BUG-01: email83 ký tự đăng nhập API200; formmaxlength64 cắt còn64, UI401. TC BB2-222 kỳ vọng thành công, chưa sửa ứng dụng.'),('Sai lệch nhãn','BUG-02: newest có nhãn Mới cập nhật nhưng sắp id DESC; chờ chốt định nghĩa theo Q-01.'),('Giới hạn','Chưa chạy toàn bộ TC, rate-limit100/15 và phiên8giờ chưa chạy trong review. Không tự ghi Pass vào bộ mẫu. Bằng chứng trong evidence/ và srs-code-review.md.')]:verification.append(r)
     style(verification,[30,145],85)
     wb.save(ROOT/'test-cases.xlsx')
-    shutil.copyfile(ROOT/'test-cases.xlsx', ROOT.parent.parent/'TEST_CASE_HOP_DEN.xlsx')
     loaded=load_workbook(ROOT/'test-cases.xlsx');assert loaded['Test cases'].max_row==len(CASES)+1
-    assert (ROOT/'test-cases.xlsx').read_bytes()==(ROOT.parent.parent/'TEST_CASE_HOP_DEN.xlsx').read_bytes()
     md=['# Kiểm thử hộp đen — Lá Thư Viện, phiên bản 2.1','',f'**{len(CASES)} test case riêng biệt**, tất cả chưa chạy. Mỗi biến thể đầu vào có ID và ô kết quả riêng. Một TC có thể có nhiều bước đọc để kiểm tra cùng một hành vi.','', '[Tải Excel](test-cases.xlsx) · [CSV](test-cases.csv) · [Script sinh tài liệu](generate_workbook.py)','', 'Nguồn: [OpenAPI](../openapi.json), [quyết định](../decisions.md), [truy vết](../traceability.md), [README](../../README.md). Đã đối chiếu SRS gốc v1.0 do người dùng gửi; xem [báo cáo SRS/code](srs-code-review.md). Đối chiếu mã để tìm khoảng trống/mâu thuẫn, không lấy hành vi triển khai làm chuẩn thay SRS.','', '## Hướng dẫn','']
     for key,value in GUIDE:md += [f'**{key}:** {value}','']
     md += ['## Điểm cần làm rõ','', '| ID | Chủ đề | Phát hiện | Xử lý |','| --- | --- | --- | --- |']
